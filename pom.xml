@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.neo4j</groupId>
+        <artifactId>parent-central</artifactId>
+        <version>22</version>
+    </parent>
+
+    <properties>
+        <neo4j-version>1.5-SNAPSHOT</neo4j-version>
+    </properties>
+
+    <groupId>org.neo4j</groupId>
+    <artifactId>neo4j-proxy</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <name>Neo4j - Proxy</name>
+
+    <developers>
+        <developer>
+            <name>Alistair Jones</name>
+            <email>alistair.jones [at] neotechnology.com</email>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <version>${neo4j-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
