@@ -37,7 +37,7 @@ public class PlaybackDriver {
         for (Event event : events) {
             try {
                 Object target = event.getTarget().getValue(playbackState);
-                Method method = deduceMethod(event, event.getTarget().getKind().apiClass());
+                Method method = deduceMethod(event, event.getTarget().apiClass());
                 Object[] arguments = decodeParameters(event.getParameters());
 
                 Object result = method.invoke(target, arguments);

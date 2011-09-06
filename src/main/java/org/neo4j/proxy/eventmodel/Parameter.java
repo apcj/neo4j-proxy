@@ -19,41 +19,13 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.proxy.playback.PlaybackState;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public abstract class Parameter {
-
-    private static Pattern pattern = Pattern.compile("(.+)\\((.*)\\)");
-
-    public static Parameter parse(String token) {
-        Matcher matcher = pattern.matcher(token);
-        matcher.find();
-        String type = matcher.group(1);
-        String value = matcher.group(2);
-        if (org.neo4j.proxy.eventmodel.RelationshipType.accepts(type)) {
-            return org.neo4j.proxy.eventmodel.RelationshipType.parse(type, value);
-        } else if (PrimitiveValue.accepts(type)) {
-            return PrimitiveValue.parse(type, value);
-        } else if (GraphEntity.accepts(type)) {
-            return GraphEntity.parse(type, value);
-        }
-        throw new IllegalArgumentException("Cannot parse: " + token);
-    }
-
-    public static Parameter fromObject(Object argument) {
-        if (argument instanceof RelationshipType) {
-            return org.neo4j.proxy.eventmodel.RelationshipType.fromObject(argument);
-        } else if (argument instanceof Node) {
-            return GraphEntity.fromObject(argument);
-        } else {
-            return PrimitiveValue.fromObject(argument);
-        }
-    }
+public interface Parameter {
 
     public abstract Object getValue(PlaybackState playbackState);
+
+    Class apiClass();
+
+    String valueAsString();
 }

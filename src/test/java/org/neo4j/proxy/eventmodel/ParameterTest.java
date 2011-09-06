@@ -20,6 +20,8 @@
 package org.neo4j.proxy.eventmodel;
 
 import org.junit.Test;
+import org.neo4j.graphdb.Node;
+import org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,28 +29,25 @@ public class ParameterTest {
 
     @Test
     public void shouldParseString() throws Exception {
-        PrimitiveValue parameter = (PrimitiveValue) Parameter.parse("String(\"name\")");
-        assertEquals(PrimitiveValue.SupportedTypes.String, parameter.getType());
-        assertEquals("name", parameter.getValue());
+        Parameter parameter = ParameterStringAdaptor.parse("String(\"name\")");
+        assertEquals("name", parameter.getValue(null));
     }
 
     @Test
     public void shouldParseInteger() throws Exception {
-        PrimitiveValue parameter = (PrimitiveValue) Parameter.parse("Integer(42)");
-        assertEquals(PrimitiveValue.SupportedTypes.Integer, parameter.getType());
-        assertEquals(42, parameter.getValue());
+        Parameter parameter = ParameterStringAdaptor.parse("Integer(42)");
+        assertEquals(42, parameter.getValue(null));
     }
 
     @Test
     public void shouldParseNode() throws Exception {
-        GraphEntity parameter = (GraphEntity) Parameter.parse("Node(13)");
-        assertEquals(GraphEntity.Kinds.Node, parameter.getKind());
-        assertEquals(13, parameter.getId());
+        Parameter parameter = ParameterStringAdaptor.parse("Node(13)");
+        assertEquals(Node.class, parameter.apiClass());
     }
 
     @Test
     public void shouldParseRelationshipType() throws Exception {
-        RelationshipType parameter = (RelationshipType) Parameter.parse("RelationshipType(\"KNOWS\")");
-        assertEquals("KNOWS", parameter.name());
+        Parameter parameter = ParameterStringAdaptor.parse("RelationshipType(\"KNOWS\")");
+        assertEquals("KNOWS", ((org.neo4j.graphdb.RelationshipType) parameter.getValue(null)).name());
     }
 }

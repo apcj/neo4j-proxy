@@ -22,13 +22,14 @@ package org.neo4j.proxy.eventmodel;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.parse;
 
 public class EventTest {
 
     @Test
     public void shouldFormatForReadability()
     {
-        Event event = new Event(new GraphEntity(GraphEntity.Kinds.Node, 20), "setProperty", new Parameter[] {new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "name"), new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "Alistair")});
+        Event event = new Event(parse("Node(20)"), "setProperty", new Parameter[] {parse("String(\"name\")"), parse("String(\"Alistair\")")});
         assertEquals("Node(20) setProperty String(\"name\") String(\"Alistair\")", event.toString());
     }
 

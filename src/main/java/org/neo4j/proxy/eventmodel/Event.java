@@ -19,18 +19,22 @@
  */
 package org.neo4j.proxy.eventmodel;
 
+import org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor;
+
+import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.serialize;
+
 public class Event {
-    private GraphEntity target;
+    private Parameter target;
     private String methodName;
     private Parameter[] parameters;
 
-    public Event(GraphEntity target, String methodName, Parameter[] parameters) {
+    public Event(Parameter target, String methodName, Parameter[] parameters) {
         this.target = target;
         this.methodName = methodName;
         this.parameters = parameters;
     }
 
-    public GraphEntity getTarget() {
+    public Parameter getTarget() {
         return target;
     }
 
@@ -45,9 +49,9 @@ public class Event {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(target).append(" ").append(methodName);
+        builder.append(serialize(target)).append(" ").append(methodName);
         for (Parameter parameter : parameters) {
-            builder.append(" ").append(parameter);
+            builder.append(" ").append(serialize(parameter));
         }
         return builder.toString();
     }
@@ -56,8 +60,8 @@ public class Event {
         String[] tokens = string.split(" ");
         Parameter[] parameters = new Parameter[tokens.length - 2];
         for (int i = 2; i < tokens.length; i++) {
-            parameters[i - 2] = Parameter.parse(tokens[i]);
+            parameters[i - 2] = ParameterStringAdaptor.parse(tokens[i]);
         }
-        return new Event((GraphEntity) Parameter.parse(tokens[0]), tokens[1], parameters);
+        return new Event(ParameterStringAdaptor.parse(tokens[0]), tokens[1], parameters);
     }
 }

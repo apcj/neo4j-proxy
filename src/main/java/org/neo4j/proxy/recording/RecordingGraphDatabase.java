@@ -21,11 +21,10 @@ package org.neo4j.proxy.recording;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.GraphEntity;
 import org.neo4j.proxy.eventmodel.Parameter;
+import org.neo4j.proxy.eventmodel.ParameterFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -46,7 +45,7 @@ public class RecordingGraphDatabase {
         //noinspection unchecked
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
-                listener.onEvent(new Event(GraphEntity.fromObject(delegate), method.getName(), convert(arguments)));
+                listener.onEvent(new Event(ParameterFactory.fromObject(delegate), method.getName(), convert(arguments)));
                 Object result = method.invoke(delegate, arguments);
                 if (result instanceof Node || result instanceof Transaction) {
                     return createProxy(listener, result, method.getReturnType());
@@ -60,7 +59,7 @@ public class RecordingGraphDatabase {
         if (arguments == null) return new Parameter[0];
         Parameter[] detachedArguments = new Parameter[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
-            detachedArguments[i] = Parameter.fromObject(arguments[i]);
+            detachedArguments[i] = ParameterFactory.fromObject(arguments[i]);
         }
         return detachedArguments;
     }

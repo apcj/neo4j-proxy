@@ -19,15 +19,14 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.junit.Test;
+public class ParameterFactory {
 
-import static org.junit.Assert.assertEquals;
-
-public class GraphEntityTest {
-
-    @Test
-    public void shouldSerializeToReadableForm()
-    {
-        assertEquals("Node(13)", new GraphEntity(GraphEntity.Kinds.Node, 13).toString());
+    public static Parameter fromObject(Object argument) {
+        for (ParameterType.Types type : ParameterType.Types.values()) {
+            if (type.acceptObject(argument)) {
+                return type.fromObject(argument);
+            }
+        }
+        throw new IllegalArgumentException("Cannot accept type of argument: " + argument);
     }
 }

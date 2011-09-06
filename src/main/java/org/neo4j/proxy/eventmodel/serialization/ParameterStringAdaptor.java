@@ -19,35 +19,30 @@
  */
 package org.neo4j.proxy.eventmodel.serialization;
 
-import org.junit.Test;
-import org.neo4j.proxy.eventmodel.Event;
 import org.neo4j.proxy.eventmodel.Parameter;
+import org.neo4j.proxy.eventmodel.ParameterType;
 
-import java.io.PrintWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.parse;
+public class ParameterStringAdaptor {
 
-public class TextSerializerTest {
+    private static Pattern pattern = Pattern.compile("(.+)\\((.*)\\)");
 
-    @Test
-    public void shouldPrintEachEvent() throws Exception {
-        PrintWriter printWriter = mock(PrintWriter.class);
-
-        Event event = new Event(parse("Node(20)"), "method", new Parameter[] {parse("String(\"name\")"), parse("String(\"Alistair\")")});
-        new TextSerializer(printWriter).onEvent(event);
-
-        verify(printWriter).println(event.toString());
+    public static Parameter parse(String token) {
+        Matcher matcher = pattern.matcher(token);
+        matcher.find();
+        String typeName = matcher.group(1);
+        String value = matcher.group(2);
+        for (ParameterType type : ParameterType.Types.values()) {
+            if (type.acceptTypeName(typeName)) {
+                return type.fromStrings(typeName, value);
+            }
+        }
+        throw new IllegalArgumentException("Cannot parse parameter: " + token);
     }
 
-    @Test
-    public void shouldFlushOnClose()
-    {
-        PrintWriter printWriter = mock(PrintWriter.class);
-
-        new TextSerializer(printWriter).flush();
-
-        verify(printWriter).flush();
+    public static String serialize(Parameter parameter) {
+        return String.format("%s(%s)", parameter.apiClass().getSimpleName(), parameter.valueAsString());
     }
 }
