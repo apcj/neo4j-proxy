@@ -23,7 +23,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.proxy.eventmodel.DetachedNode;
 import org.neo4j.proxy.eventmodel.Event;
 import org.neo4j.proxy.eventmodel.Parameter;
 
@@ -39,10 +38,10 @@ public class RecordingGraphDatabase {
 
     public static GraphDatabaseService create(final Listener listener, final GraphDatabaseService delegate) {
         final Listener filteredListener = new FilterOutUninterestingMethods(listener);
-        return createRecordingNode(filteredListener, delegate, GraphDatabaseService.class);
+        return createProxy(filteredListener, delegate, GraphDatabaseService.class);
     }
 
-    public static <T> T createRecordingNode(final Listener listener, final T delegate, final Class aClass) {
+    public static <T> T createProxy(final Listener listener, final T delegate, final Class aClass) {
         final String target = describe(delegate, aClass);
         //noinspection unchecked
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
@@ -51,7 +50,7 @@ public class RecordingGraphDatabase {
                 listener.onEvent(new Event(target, method.getName(), convert(arguments)));
                 Object result = method.invoke(delegate, args);
                 if (result instanceof Node || result instanceof Transaction) {
-                    return createRecordingNode(listener, result, method.getReturnType());
+                    return createProxy(listener, result, method.getReturnType());
                 }
                 return result;
             }
