@@ -20,17 +20,17 @@
 package org.neo4j.proxy.eventmodel;
 
 public class Event {
-    private String target;
+    private GraphEntity target;
     private String methodName;
     private Parameter[] parameters;
 
-    public Event(String target, String methodName, Parameter[] parameters) {
+    public Event(GraphEntity target, String methodName, Parameter[] parameters) {
         this.target = target;
         this.methodName = methodName;
         this.parameters = parameters;
     }
 
-    public String getTarget() {
+    public GraphEntity getTarget() {
         return target;
     }
 
@@ -58,6 +58,6 @@ public class Event {
         for (int i = 2; i < tokens.length; i++) {
             parameters[i - 2] = Parameter.parse(tokens[i]);
         }
-        return new Event(tokens[0], tokens[1], parameters);
+        return new Event((GraphEntity) Parameter.parse(tokens[0]), tokens[1], parameters);
     }
 }

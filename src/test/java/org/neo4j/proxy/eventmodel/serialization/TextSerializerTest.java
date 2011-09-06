@@ -21,6 +21,7 @@ package org.neo4j.proxy.eventmodel.serialization;
 
 import org.junit.Test;
 import org.neo4j.proxy.eventmodel.Event;
+import org.neo4j.proxy.eventmodel.GraphEntity;
 import org.neo4j.proxy.eventmodel.Parameter;
 import org.neo4j.proxy.eventmodel.PrimitiveValue;
 
@@ -34,7 +35,7 @@ public class TextSerializerTest {
     public void shouldPrintEachEvent() throws Exception {
         PrintWriter printWriter = mock(PrintWriter.class);
 
-        Event event = new Event("target", "method", new Parameter[] {new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "name"), new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "Alistair")});
+        Event event = new Event(new GraphEntity(GraphEntity.Kinds.Node, 20), "method", new Parameter[] {new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "name"), new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "Alistair")});
         new TextSerializer(printWriter).onEvent(event);
 
         verify(printWriter).println(event.toString());

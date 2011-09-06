@@ -66,6 +66,15 @@ public class RecordReplayTest {
         makeAssertionsAboutTheData(playbackStoreDir);
     }
 
+    @Test
+    public void printEventsToConsole()
+    {
+        String recordedStoreDir = "target/recordedDatabase";
+        TextSerializer textSerializer = new TextSerializer(new PrintWriter(System.out));
+        writeToDatabase(recordedStoreDir, textSerializer);
+        textSerializer.flush();
+    }
+
     private void makeAssertionsAboutTheData(String playbackStoreDir) {
         EmbeddedReadOnlyGraphDatabase readDatabase = new EmbeddedReadOnlyGraphDatabase(playbackStoreDir);
         Iterable<Relationship> relationships = readDatabase.getNodeById(1).getRelationships(RelationshipTypes.working_on, Direction.INCOMING);

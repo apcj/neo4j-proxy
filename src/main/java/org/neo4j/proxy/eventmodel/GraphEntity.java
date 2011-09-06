@@ -19,7 +19,9 @@
  */
 package org.neo4j.proxy.eventmodel;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.playback.NodeCache;
 
 import java.util.ArrayList;
@@ -55,7 +57,7 @@ public class GraphEntity extends Parameter {
     }
 
     public enum Kinds {
-        Node;
+        GraphDatabaseService, Node, Transaction;
     }
 
     public static GraphEntity parse(String typeString, String valueString) {
@@ -64,7 +66,14 @@ public class GraphEntity extends Parameter {
     }
 
     public static GraphEntity fromObject(Object entity) {
-        return new GraphEntity(Kinds.Node, ((Node) entity).getId());
+        if (entity instanceof GraphDatabaseService) {
+            return new GraphEntity(Kinds.GraphDatabaseService, 0);
+        } else if (entity instanceof Transaction) {
+            return new GraphEntity(Kinds.Transaction, 0);
+        } else if (entity instanceof Node) {
+            return new GraphEntity(Kinds.Node, ((Node) entity).getId());
+        }
+        throw new IllegalArgumentException("Not a recognised GraphEntity type: " + entity);
     }
 
     public Object getValue(NodeCache nodeCache) {

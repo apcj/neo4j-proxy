@@ -28,7 +28,7 @@ public class EventTest {
     @Test
     public void shouldFormatForReadability()
     {
-        Event event = new Event("Node(20)", "setProperty", new Parameter[] {new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "name"), new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "Alistair")});
+        Event event = new Event(new GraphEntity(GraphEntity.Kinds.Node, 20), "setProperty", new Parameter[] {new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "name"), new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "Alistair")});
         assertEquals("Node(20) setProperty String(\"name\") String(\"Alistair\")", event.toString());
     }
 

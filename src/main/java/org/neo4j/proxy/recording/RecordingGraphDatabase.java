@@ -24,6 +24,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.Event;
+import org.neo4j.proxy.eventmodel.GraphEntity;
 import org.neo4j.proxy.eventmodel.Parameter;
 
 import java.lang.reflect.InvocationHandler;
@@ -42,13 +43,11 @@ public class RecordingGraphDatabase {
     }
 
     public static <T> T createProxy(final Listener listener, final T delegate, final Class aClass) {
-        final String target = describe(delegate, aClass);
         //noinspection unchecked
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                Object[] arguments = args == null ? new Object[0] : args;
-                listener.onEvent(new Event(target, method.getName(), convert(arguments)));
-                Object result = method.invoke(delegate, args);
+            public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
+                listener.onEvent(new Event(GraphEntity.fromObject(delegate), method.getName(), convert(arguments)));
+                Object result = method.invoke(delegate, arguments);
                 if (result instanceof Node || result instanceof Transaction) {
                     return createProxy(listener, result, method.getReturnType());
                 }
@@ -58,21 +57,12 @@ public class RecordingGraphDatabase {
     }
 
     private static Parameter[] convert(Object[] arguments) {
+        if (arguments == null) return new Parameter[0];
         Parameter[] detachedArguments = new Parameter[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             detachedArguments[i] = Parameter.fromObject(arguments[i]);
         }
         return detachedArguments;
-    }
-
-    private static <T> String describe(T delegate, Class aClass) {
-        if (delegate instanceof Node) {
-            return "Node[" + ((Node) delegate).getId() + "]";
-        }
-        if (delegate instanceof Relationship) {
-            return "Relationship[" + ((Relationship) delegate).getId() + "]";
-        }
-        return aClass.getSimpleName();
     }
 
     private static class FilterOutUninterestingMethods implements Listener {

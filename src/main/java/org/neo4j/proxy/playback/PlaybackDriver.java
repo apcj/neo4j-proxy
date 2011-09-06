@@ -22,15 +22,12 @@ package org.neo4j.proxy.playback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.proxy.eventmodel.DetachedNode;
 import org.neo4j.proxy.eventmodel.Event;
 import org.neo4j.proxy.eventmodel.GraphEntity;
 import org.neo4j.proxy.eventmodel.Parameter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import static org.neo4j.proxy.playback.NodeCache.nodeId;
 
 public class PlaybackDriver {
     private GraphDatabaseService graphDatabase;
@@ -44,11 +41,11 @@ public class PlaybackDriver {
     public void playback(Iterable<Event> events) {
         for (Event event : events) {
             Class<? extends GraphDatabaseService> graphDatabaseClass = GraphDatabaseService.class;
-            if (event.getTarget().equals(graphDatabaseClass.getSimpleName())) {
+            if (event.getTarget().getKind() == GraphEntity.Kinds.GraphDatabaseService) {
                 play(event, graphDatabase, graphDatabaseClass);
-            } else if (event.getTarget().startsWith("Node")) {
-                play(event, nodeCache.get(nodeId(event.getTarget())), Node.class);
-            } else if (event.getTarget().startsWith("Transaction")) {
+            } else if (event.getTarget().getKind() == GraphEntity.Kinds.Node) {
+                play(event, event.getTarget().getValue(nodeCache), Node.class);
+            } else if (event.getTarget().getKind() == GraphEntity.Kinds.Transaction) {
                 play(event, currentTransaction, Transaction.class);
             }
         }
