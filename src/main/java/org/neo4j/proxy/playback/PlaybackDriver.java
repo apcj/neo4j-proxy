@@ -20,45 +20,33 @@
 package org.neo4j.proxy.playback;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.GraphEntity;
 import org.neo4j.proxy.eventmodel.Parameter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class PlaybackDriver {
-    private GraphDatabaseService graphDatabase;
     private PlaybackState playbackState;
 
     public PlaybackDriver(GraphDatabaseService graphDatabase) {
-        this.graphDatabase = graphDatabase;
         playbackState = new PlaybackState(graphDatabase);
     }
 
     public void playback(Iterable<Event> events) {
         for (Event event : events) {
-            Class<? extends GraphDatabaseService> graphDatabaseClass = GraphDatabaseService.class;
-            if (event.getTarget().getKind() == GraphEntity.Kinds.GraphDatabaseService) {
-                play(event, graphDatabase, graphDatabaseClass);
-            } else if (event.getTarget().getKind() == GraphEntity.Kinds.Node) {
-                play(event, event.getTarget().getValue(playbackState), Node.class);
-            } else if (event.getTarget().getKind() == GraphEntity.Kinds.Transaction) {
-                play(event, event.getTarget().getValue(playbackState), Transaction.class);
-            }
-        }
-    }
+            try {
+                Object target = event.getTarget().getValue(playbackState);
+                Method method = deduceMethod(event, event.getTarget().getKind().apiClass());
+                Object[] arguments = decodeParameters(event.getParameters());
 
-    private <T> void play(Event event, T target, Class<? extends T> targetClass) {
-        try {
-            Object result = deduceMethod(event, targetClass).invoke(target, decodeParameters(event.getParameters()));
-            playbackState.capture(result);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+                Object result = method.invoke(target, arguments);
+                playbackState.capture(result);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -76,7 +64,8 @@ public class PlaybackDriver {
                 return candidateMethod;
             }
         }
-        throw new IllegalArgumentException(String.format("no suitable method named %s on class %s", event.getMethodName(), targetClass));
+        throw new IllegalArgumentException(String.format("no suitable method named %s on class %s",
+                event.getMethodName(), targetClass));
     }
 
 }

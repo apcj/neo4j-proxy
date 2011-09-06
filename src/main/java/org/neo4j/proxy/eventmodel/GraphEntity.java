@@ -45,7 +45,7 @@ public class GraphEntity extends Parameter {
         }
     }
 
-    public Object getKind() {
+    public Kinds getKind() {
         return kind;
     }
 
@@ -59,19 +59,29 @@ public class GraphEntity extends Parameter {
 
     public enum Kinds {
         GraphDatabaseService {
+            public Class apiClass() {
+                return GraphDatabaseService.class;
+            }
             Object lookupValueFromPlaybackState(long id, PlaybackState playbackState) {
                 return playbackState.getGraphDatabase();
             }
         }, Node {
+            public Class apiClass() {
+                return Node.class;
+            }
             Object lookupValueFromPlaybackState(long id, PlaybackState playbackState) {
                 return playbackState.getNodeCache().get(id);
             }
         }, Transaction {
+            public Class apiClass() {
+                return Transaction.class;
+            }
             Object lookupValueFromPlaybackState(long id, PlaybackState playbackState) {
                 return playbackState.getCurrentTransaction();
             }
         };
 
+        public abstract Class apiClass();
         abstract Object lookupValueFromPlaybackState(long id, PlaybackState playbackState);
     }
 
