@@ -19,7 +19,7 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.neo4j.proxy.playback.NodeCache;
+import org.neo4j.proxy.playback.PlaybackState;
 
 public class RelationshipType extends Parameter implements org.neo4j.graphdb.RelationshipType {
     private String name;
@@ -44,7 +44,7 @@ public class RelationshipType extends Parameter implements org.neo4j.graphdb.Rel
         return new RelationshipType(((org.neo4j.graphdb.RelationshipType) argument).name());
     }
 
-    public Object getValue(NodeCache nodeCache) {
+    public Object getValue(PlaybackState playbackState) {
         return this;
     }
 

@@ -21,7 +21,7 @@ package org.neo4j.proxy.eventmodel;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.proxy.playback.NodeCache;
+import org.neo4j.proxy.playback.PlaybackState;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,5 +55,5 @@ public abstract class Parameter {
         }
     }
 
-    public abstract Object getValue(NodeCache nodeCache);
+    public abstract Object getValue(PlaybackState playbackState);
 }

@@ -19,10 +19,11 @@
  */
 package org.neo4j.proxy.eventmodel;
 
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.proxy.playback.NodeCache;
+import org.neo4j.proxy.playback.PlaybackState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,21 @@ public class GraphEntity extends Parameter {
     }
 
     public enum Kinds {
-        GraphDatabaseService, Node, Transaction;
+        GraphDatabaseService {
+            Object lookupValueFromPlaybackState(long id, PlaybackState playbackState) {
+                return playbackState.getGraphDatabase();
+            }
+        }, Node {
+            Object lookupValueFromPlaybackState(long id, PlaybackState playbackState) {
+                return playbackState.getNodeCache().get(id);
+            }
+        }, Transaction {
+            Object lookupValueFromPlaybackState(long id, PlaybackState playbackState) {
+                return playbackState.getCurrentTransaction();
+            }
+        };
+
+        abstract Object lookupValueFromPlaybackState(long id, PlaybackState playbackState);
     }
 
     public static GraphEntity parse(String typeString, String valueString) {
@@ -76,8 +91,8 @@ public class GraphEntity extends Parameter {
         throw new IllegalArgumentException("Not a recognised GraphEntity type: " + entity);
     }
 
-    public Object getValue(NodeCache nodeCache) {
-        return nodeCache.get(id);
+    public Object getValue(PlaybackState playbackState) {
+        return kind.lookupValueFromPlaybackState(id, playbackState);
     }
 
     @Override

@@ -31,11 +31,11 @@ import java.lang.reflect.Method;
 
 public class PlaybackDriver {
     private GraphDatabaseService graphDatabase;
-    private NodeCache nodeCache = new NodeCache();
-    private Transaction currentTransaction = null;
+    private PlaybackState playbackState;
 
     public PlaybackDriver(GraphDatabaseService graphDatabase) {
         this.graphDatabase = graphDatabase;
+        playbackState = new PlaybackState(graphDatabase);
     }
 
     public void playback(Iterable<Event> events) {
@@ -44,16 +44,17 @@ public class PlaybackDriver {
             if (event.getTarget().getKind() == GraphEntity.Kinds.GraphDatabaseService) {
                 play(event, graphDatabase, graphDatabaseClass);
             } else if (event.getTarget().getKind() == GraphEntity.Kinds.Node) {
-                play(event, event.getTarget().getValue(nodeCache), Node.class);
+                play(event, event.getTarget().getValue(playbackState), Node.class);
             } else if (event.getTarget().getKind() == GraphEntity.Kinds.Transaction) {
-                play(event, currentTransaction, Transaction.class);
+                play(event, event.getTarget().getValue(playbackState), Transaction.class);
             }
         }
     }
 
     private <T> void play(Event event, T target, Class<? extends T> targetClass) {
         try {
-            capture(deduceMethod(event, targetClass).invoke(target, decodeParameters(event.getParameters())));
+            Object result = deduceMethod(event, targetClass).invoke(target, decodeParameters(event.getParameters()));
+            playbackState.capture(result);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
@@ -64,18 +65,9 @@ public class PlaybackDriver {
     private Object[] decodeParameters(Parameter[] parameters) {
         Object[] decodedParameters = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
-            decodedParameters[i] = parameters[i].getValue(nodeCache);
+            decodedParameters[i] = parameters[i].getValue(playbackState);
         }
         return decodedParameters;
-    }
-
-    private void capture(Object result) {
-        if (result instanceof Node) {
-            nodeCache.put((Node) result);
-        }
-        if (result instanceof Transaction) {
-            currentTransaction = (Transaction) result;
-        }
     }
 
     private Method deduceMethod(Event event, Class targetClass) {

@@ -19,7 +19,7 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.neo4j.proxy.playback.NodeCache;
+import org.neo4j.proxy.playback.PlaybackState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +85,7 @@ public class PrimitiveValue extends Parameter {
         return new PrimitiveValue(SupportedTypes.valueOf(object.getClass().getSimpleName()), object);
     }
 
-    public Object getValue(NodeCache nodeCache) {
+    public Object getValue(PlaybackState playbackState) {
         return getValue();
     }
 }
