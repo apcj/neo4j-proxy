@@ -19,7 +19,6 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
