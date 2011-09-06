@@ -22,9 +22,9 @@ package org.neo4j.proxy.eventmodel;
 public class Event {
     private String target;
     private String methodName;
-    private Object[] parameters;
+    private Parameter[] parameters;
 
-    public Event(String target, String methodName, Object[] parameters) {
+    public Event(String target, String methodName, Parameter[] parameters) {
         this.target = target;
         this.methodName = methodName;
         this.parameters = parameters;
@@ -38,7 +38,7 @@ public class Event {
         return methodName;
     }
 
-    public Object[] getParameters() {
+    public Parameter[] getParameters() {
         return parameters;
     }
 
@@ -46,10 +46,18 @@ public class Event {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(target).append(" ").append(methodName);
-        for (Object parameter : parameters) {
+        for (Parameter parameter : parameters) {
             builder.append(" ").append(parameter);
         }
         return builder.toString();
     }
 
+    public static Event parse(String string) {
+        String[] tokens = string.split(" ");
+        Parameter[] parameters = new Parameter[tokens.length - 2];
+        for (int i = 2; i < tokens.length; i++) {
+            parameters[i - 2] = Parameter.parse(tokens[i]);
+        }
+        return new Event(tokens[0], tokens[1], parameters);
+    }
 }

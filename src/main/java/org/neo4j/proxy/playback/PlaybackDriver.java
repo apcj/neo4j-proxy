@@ -24,6 +24,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.DetachedNode;
 import org.neo4j.proxy.eventmodel.Event;
+import org.neo4j.proxy.eventmodel.GraphEntity;
+import org.neo4j.proxy.eventmodel.Parameter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -62,19 +64,12 @@ public class PlaybackDriver {
         }
     }
 
-    private Object[] decodeParameters(Object[] parameters) {
+    private Object[] decodeParameters(Parameter[] parameters) {
         Object[] decodedParameters = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
-            decodedParameters[i] = decodeParameter(parameters[i]);
+            decodedParameters[i] = parameters[i].getValue(nodeCache);
         }
         return decodedParameters;
-    }
-
-    private Object decodeParameter(Object parameter) {
-        if (parameter instanceof DetachedNode) {
-            return nodeCache.get(((DetachedNode) parameter).getId());
-        }
-        return parameter;
     }
 
     private void capture(Object result) {
@@ -95,12 +90,4 @@ public class PlaybackDriver {
         throw new IllegalArgumentException(String.format("no suitable method named %s on class %s", event.getMethodName(), targetClass));
     }
 
-    private Class[] deduceTypes(Object[] parameters) {
-        Class[] types = new Class[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            Object parameter = parameters[i];
-            types[i] = parameter.getClass();
-        }
-        return types;
-    }
 }

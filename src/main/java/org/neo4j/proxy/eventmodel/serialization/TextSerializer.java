@@ -17,25 +17,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel;
+package org.neo4j.proxy.eventmodel.serialization;
 
-import org.junit.Test;
+import org.neo4j.proxy.eventmodel.Event;
+import org.neo4j.proxy.recording.RecordingGraphDatabase;
 
-import static org.junit.Assert.assertEquals;
+import java.io.PrintWriter;
 
-public class EventTest {
+public class TextSerializer implements RecordingGraphDatabase.Listener {
+    private PrintWriter writer;
 
-    @Test
-    public void shouldFormatForReadability()
-    {
-        Event event = new Event("Node(20)", "setProperty", new Parameter[] {new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "name"), new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "Alistair")});
-        assertEquals("Node(20) setProperty String(\"name\") String(\"Alistair\")", event.toString());
+    public TextSerializer(PrintWriter writer) {
+        this.writer = writer;
     }
 
-    @Test
-    public void shouldParseFromString()
-    {
-        Event event = Event.parse("Node(20) setProperty String(\"name\") String(\"Alistair\")");
-        assertEquals(2, event.getParameters().length);
+    @Override
+    public void onEvent(Event event) {
+        writer.println(event.toString());
+    }
+
+    public void flush() {
+        writer.flush();
     }
 }

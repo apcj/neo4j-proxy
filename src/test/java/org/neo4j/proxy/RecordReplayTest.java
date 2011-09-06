@@ -25,11 +25,12 @@ import org.neo4j.graphdb.*;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 import org.neo4j.proxy.eventmodel.Event;
+import org.neo4j.proxy.eventmodel.serialization.TextDeserializer;
+import org.neo4j.proxy.eventmodel.serialization.TextSerializer;
 import org.neo4j.proxy.playback.PlaybackDriver;
 import org.neo4j.proxy.recording.RecordingGraphDatabase;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,11 +42,27 @@ public class RecordReplayTest {
     public void shouldRecordAndPlayback()
     {
         String recordedStoreDir = "target/recordedDatabase";
-        final List<Event> events = writeToDatabase(recordedStoreDir);
+        final List<Event> events = new ArrayList<Event>();
+        writeToDatabase(recordedStoreDir, new EventListAccumulator(events));
         makeAssertionsAboutTheData(recordedStoreDir);
 
         String playbackStoreDir = "target/playbackDatabase";
         playbackToDifferentDatabase(events, playbackStoreDir);
+        makeAssertionsAboutTheData(playbackStoreDir);
+    }
+
+    @Test
+    public void shouldRecordAndPlaybackAfterSerialisingEvents()
+    {
+        String recordedStoreDir = "target/recordedDatabase";
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        TextSerializer serializer = new TextSerializer(new PrintWriter(byteArrayOutputStream));
+        writeToDatabase(recordedStoreDir, serializer);
+        serializer.flush();
+        makeAssertionsAboutTheData(recordedStoreDir);
+
+        String playbackStoreDir = "target/playbackDatabase";
+        playbackToDifferentDatabase(new TextDeserializer(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())))), playbackStoreDir);
         makeAssertionsAboutTheData(playbackStoreDir);
     }
 
@@ -60,7 +77,7 @@ public class RecordReplayTest {
         readDatabase.shutdown();
     }
 
-    private EmbeddedGraphDatabase playbackToDifferentDatabase(List<Event> events, String playbackStoreDir) {
+    private EmbeddedGraphDatabase playbackToDifferentDatabase(Iterable<Event> events, String playbackStoreDir) {
         clean(playbackStoreDir);
 
         EmbeddedGraphDatabase playbackGraphDatabase = new EmbeddedGraphDatabase(playbackStoreDir);
@@ -70,21 +87,14 @@ public class RecordReplayTest {
         return playbackGraphDatabase;
     }
 
-    private List<Event> writeToDatabase(String storeDir) {
+    private void writeToDatabase(String storeDir, RecordingGraphDatabase.Listener listener) {
         clean(storeDir);
 
-        final List<Event> events = new ArrayList<Event>();
-
-        GraphDatabaseService recordingGraphDatabase = RecordingGraphDatabase.create(new RecordingGraphDatabase.Listener() {
-            public void onEvent(Event event) {
-                events.add(event);
-            }
-        }, new EmbeddedGraphDatabase(storeDir));
+        GraphDatabaseService recordingGraphDatabase = RecordingGraphDatabase.create(listener, new EmbeddedGraphDatabase(storeDir));
 
         addData(recordingGraphDatabase);
 
         recordingGraphDatabase.shutdown();
-        return events;
     }
 
     private void clean(String storeDir) {
@@ -118,5 +128,17 @@ public class RecordReplayTest {
 
     public enum RelationshipTypes implements RelationshipType {
         working_on
+    }
+
+    private static class EventListAccumulator implements RecordingGraphDatabase.Listener {
+        private final List<Event> events;
+
+        public EventListAccumulator(List<Event> events) {
+            this.events = events;
+        }
+
+        public void onEvent(Event event) {
+            events.add(event);
+        }
     }
 }

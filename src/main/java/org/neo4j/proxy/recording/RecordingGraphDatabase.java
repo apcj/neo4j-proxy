@@ -25,6 +25,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.DetachedNode;
 import org.neo4j.proxy.eventmodel.Event;
+import org.neo4j.proxy.eventmodel.Parameter;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -47,7 +48,7 @@ public class RecordingGraphDatabase {
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 Object[] arguments = args == null ? new Object[0] : args;
-                listener.onEvent(new Event(target, method.getName(), detachArguments(arguments)));
+                listener.onEvent(new Event(target, method.getName(), convert(arguments)));
                 Object result = method.invoke(delegate, args);
                 if (result instanceof Node || result instanceof Transaction) {
                     return createRecordingNode(listener, result, method.getReturnType());
@@ -57,19 +58,12 @@ public class RecordingGraphDatabase {
         });
     }
 
-    private static Object[] detachArguments(Object[] arguments) {
-        Object[] detachedArguments = new Object[arguments.length];
+    private static Parameter[] convert(Object[] arguments) {
+        Parameter[] detachedArguments = new Parameter[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
-            detachedArguments[i] = detachArgument(arguments[i]);
+            detachedArguments[i] = Parameter.fromObject(arguments[i]);
         }
         return detachedArguments;
-    }
-
-    private static Object detachArgument(Object argument) {
-        if (argument instanceof Node) {
-            return new DetachedNode(((Node) argument).getId());
-        }
-        return argument;
     }
 
     private static <T> String describe(T delegate, Class aClass) {

@@ -23,19 +23,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class EventTest {
+public class GraphEntityTest {
 
     @Test
-    public void shouldFormatForReadability()
+    public void shouldSerializeToReadableForm()
     {
-        Event event = new Event("Node(20)", "setProperty", new Parameter[] {new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "name"), new PrimitiveValue(PrimitiveValue.SupportedTypes.String, "Alistair")});
-        assertEquals("Node(20) setProperty String(\"name\") String(\"Alistair\")", event.toString());
-    }
-
-    @Test
-    public void shouldParseFromString()
-    {
-        Event event = Event.parse("Node(20) setProperty String(\"name\") String(\"Alistair\")");
-        assertEquals(2, event.getParameters().length);
+        assertEquals("Node(13)", new GraphEntity(GraphEntity.Kinds.Node, 13).toString());
     }
 }
