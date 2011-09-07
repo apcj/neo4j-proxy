@@ -36,7 +36,7 @@ public class PlaybackDriver {
     public void playback(Iterable<Event> events) {
         for (Event event : events) {
             try {
-                Object target = event.getTarget().getValue(playbackState);
+                Object target = event.getTarget().getValueForPlayback(playbackState);
                 Method method = deduceMethod(event, event.getTarget().getType().getWrappedType());
                 Object[] arguments = decodeParameters(event.getParameters());
 
@@ -53,7 +53,7 @@ public class PlaybackDriver {
     private Object[] decodeParameters(Parameter[] parameters) {
         Object[] decodedParameters = new Object[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
-            decodedParameters[i] = parameters[i].getValue(playbackState);
+            decodedParameters[i] = parameters[i].getValueForPlayback(playbackState);
         }
         return decodedParameters;
     }

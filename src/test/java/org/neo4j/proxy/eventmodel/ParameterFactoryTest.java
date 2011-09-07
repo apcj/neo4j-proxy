@@ -47,18 +47,18 @@ public class ParameterFactoryTest {
     }
 
     private void assertCanRoundTrip(Object object) {
-        assertEquals(object, fromObject(object).getValue(null));
-        assertEquals(object, parseParameter(serializeParameter(fromObject(object))).getValue(null));
+        assertEquals(object, fromObject(object).getValueForPlayback(null));
+        assertEquals(object, parseParameter(serializeParameter(fromObject(object))).getValueForPlayback(null));
     }
 
     private void assertCanRoundTripArray(int[] array) {
-        assertArrayEquals(array, (int[]) fromObject(array).getValue(null));
-        assertArrayEquals(array, (int[]) parseParameter(serializeParameter(fromObject(array))).getValue(null));
+        assertArrayEquals(array, (int[]) fromObject(array).getValueForPlayback(null));
+        assertArrayEquals(array, (int[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
     }
 
     private void assertCanRoundTripArray(boolean[] array) {
-        assertBooleanArrayEquals(array, (boolean[]) fromObject(array).getValue(null));
-        assertBooleanArrayEquals(array, (boolean[]) parseParameter(serializeParameter(fromObject(array))).getValue(null));
+        assertBooleanArrayEquals(array, (boolean[]) fromObject(array).getValueForPlayback(null));
+        assertBooleanArrayEquals(array, (boolean[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
     }
 
     private void assertBooleanArrayEquals(boolean[] expected, boolean[] actual) {
@@ -69,7 +69,7 @@ public class ParameterFactoryTest {
     }
 
     private void assertCanRoundTripArray(Object[] array) {
-        assertArrayEquals(array, (Object[]) fromObject(array).getValue(null));
-        assertArrayEquals(array, (Object[]) parseParameter(serializeParameter(fromObject(array))).getValue(null));
+        assertArrayEquals(array, (Object[]) fromObject(array).getValueForPlayback(null));
+        assertArrayEquals(array, (Object[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
     }
 }

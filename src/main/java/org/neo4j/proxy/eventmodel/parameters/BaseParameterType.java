@@ -33,6 +33,10 @@ public abstract class BaseParameterType implements ParameterType {
         return wrappedType;
     }
 
+    public Class getSerializedType() {
+        return wrappedType;
+    }
+
     public boolean acceptTypeName(String typeString) {
         return wrappedType.getSimpleName().equals(typeString);
     }

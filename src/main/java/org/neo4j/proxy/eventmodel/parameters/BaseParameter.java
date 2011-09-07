@@ -42,7 +42,7 @@ public abstract class BaseParameter implements Parameter {
         BaseParameter that = (BaseParameter) o;
 
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
-        if (valueAsString() != null ? !valueAsString().equals(that.valueAsString()) : that.valueAsString() != null) return false;
+        if (getValueForSerialization() != null ? !getValueForSerialization().equals(that.getValueForSerialization()) : that.getValueForSerialization() != null) return false;
 
         return true;
     }

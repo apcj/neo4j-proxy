@@ -25,7 +25,7 @@ public interface Parameter {
 
     ParameterType getType();
 
-    Object getValue(PlaybackState playbackState);
+    Object getValueForPlayback(PlaybackState playbackState);
 
-    String valueAsString();
+    Object getValueForSerialization();
 }

@@ -21,8 +21,9 @@ package org.neo4j.proxy.eventmodel;
 
 public interface ParameterType {
     Class getWrappedType();
+    Class getSerializedType();
     boolean acceptTypeName(String typeString);
     boolean acceptObject(Object object);
-    Parameter fromStrings(String typeString, String valueString);
+    Parameter fromSerializedValue(String typeString, Object serializedValue);
     public Parameter fromObject(Object entity);
 }

@@ -20,6 +20,7 @@
 package org.neo4j.proxy.eventmodel.serialization;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -28,11 +29,15 @@ import org.neo4j.proxy.eventmodel.Parameter;
 import org.neo4j.proxy.eventmodel.ParameterFactory;
 import org.neo4j.proxy.eventmodel.ParameterType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class JacksonAdaptor {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     public static JsonNode serializeEvent(Event event) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("target", serializeParameter(event.getTarget()));
@@ -68,16 +73,20 @@ public class JacksonAdaptor {
     public static JsonNode serializeParameter(Parameter argument) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("type", argument.getType().getWrappedType().getSimpleName());
-        node.put("value", argument.valueAsString());
+        node.put("value", mapper.<JsonNode>valueToTree(argument.getValueForSerialization()));
         return node;
     }
 
     public static Parameter parseParameter(JsonNode jsonNode) {
         String typeName = jsonNode.get("type").getTextValue();
-        String value = jsonNode.get("value").getTextValue();
         for (ParameterType type : ParameterFactory.types) {
             if (type.acceptTypeName(typeName)) {
-                return type.fromStrings(typeName, value);
+                try {
+                    Object serializedValue = mapper.<Object>treeToValue(jsonNode.get("value"), type.getSerializedType());
+                    return type.fromSerializedValue(typeName, serializedValue);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         throw new IllegalArgumentException("Cannot parse parameter: " + jsonNode);

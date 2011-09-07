@@ -32,22 +32,25 @@ public class ParameterFactory {
     public static final List<ParameterType> types = new ArrayList<ParameterType>();
     static {
         types.add(new BaseParameterType(GraphDatabaseService.class) {
+            public Class getSerializedType() {
+                return String.class;
+            }
 
             class GraphDatabaseServiceParameter extends BaseParameter {
                 protected GraphDatabaseServiceParameter(ParameterType type) {
                     super(type);
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return playbackState.getGraphDatabase();
                 }
 
-                public String valueAsString() {
+                public Object getValueForSerialization() {
                     return "";
                 }
             }
 
-            public Parameter fromStrings(String typeString, String valueString) {
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
                 return new GraphDatabaseServiceParameter(this);
             }
 
@@ -56,21 +59,24 @@ public class ParameterFactory {
             }
         });
         types.add(new BaseParameterType(Transaction.class) {
+            public Class getSerializedType() {
+                return String.class;
+            }
 
             class TransactionParameter extends BaseParameter {
                 protected TransactionParameter(ParameterType type) {
                     super(type);
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return playbackState.getCurrentTransaction();
                 }
 
-                public String valueAsString() {
+                public Object getValueForSerialization() {
                     return "";
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
                 return new TransactionParameter(this);
             }
 
@@ -80,6 +86,10 @@ public class ParameterFactory {
         });
         types.add(new BaseParameterType(Node.class) {
 
+            public Class getSerializedType() {
+                return long.class;
+            }
+
             class NodeParameter extends BaseParameter {
                 private long id;
 
@@ -88,16 +98,16 @@ public class ParameterFactory {
                     this.id = id;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return playbackState.getNodeCache().get(id);
                 }
 
-                public String valueAsString() {
-                    return java.lang.String.valueOf(id);
+                public Object getValueForSerialization() {
+                    return id;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                return new NodeParameter(this, Long.parseLong(valueString));
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new NodeParameter(this, (Long) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
@@ -105,6 +115,10 @@ public class ParameterFactory {
             }
         });
         types.add(new BaseParameterType(RelationshipType.class) {
+
+            public Class getSerializedType() {
+                return String.class;
+            }
 
             class RelationshipTypeParameter extends BaseParameter implements RelationshipType {
                 private String name;
@@ -114,7 +128,7 @@ public class ParameterFactory {
                     this.name = name;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return this;
                 }
 
@@ -122,12 +136,12 @@ public class ParameterFactory {
                     return name;
                 }
 
-                public String valueAsString() {
-                    return "\"" + name + "\"";
+                public Object getValueForSerialization() {
+                    return name;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                return new RelationshipTypeParameter(this, valueString.substring(1, valueString.length() - 1));
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new RelationshipTypeParameter(this, (String) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
@@ -135,6 +149,10 @@ public class ParameterFactory {
             }
         });
         types.add(new BaseParameterType(Direction.class) {
+
+            public Class getSerializedType() {
+                return String.class;
+            }
 
             class DirectionParameter extends BaseParameter {
                 private org.neo4j.graphdb.Direction direction;
@@ -144,16 +162,16 @@ public class ParameterFactory {
                     this.direction = direction;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return direction;
                 }
 
-                public String valueAsString() {
+                public Object getValueForSerialization() {
                     return direction.name();
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                return new DirectionParameter(this, org.neo4j.graphdb.Direction.valueOf(valueString));
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new DirectionParameter(this, org.neo4j.graphdb.Direction.valueOf((String) serializedValue));
             }
 
             public Parameter fromObject(Object entity) {
@@ -170,16 +188,16 @@ public class ParameterFactory {
                     this.value = value;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return value;
                 }
 
-                public String valueAsString() {
-                    return "\"" + value + "\"";
+                public Object getValueForSerialization() {
+                    return value;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                return new StringParameter(this, valueString.substring(1, valueString.length() - 1));
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new StringParameter(this, (String) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
@@ -196,16 +214,16 @@ public class ParameterFactory {
                     this.value = value;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return value;
                 }
 
-                public String valueAsString() {
-                    return java.lang.String.valueOf(value);
+                public Object getValueForSerialization() {
+                    return value;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                return new IntegerParameter(this, java.lang.Integer.parseInt(valueString));
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new IntegerParameter(this, (Integer) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
@@ -221,31 +239,16 @@ public class ParameterFactory {
                     this.array = array;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return array;
                 }
 
-                public String valueAsString() {
-                    StringBuilder builder = new StringBuilder("{");
-                    for (int i = 0; i < array.length; i++) {
-                        builder.append(array[i]);
-                        if (i < array.length - 1) {
-                            builder.append(", ");
-                        }
-                    }
-                    return builder.append("}").toString();
+                public Object getValueForSerialization() {
+                    return array;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                String[] tokens = new String[0];
-                if (valueString.contains(", ")) {
-                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
-                }
-                int[] array = new int[tokens.length];
-                for (int i = 0; i < tokens.length; i++) {
-                    array[i] = Integer.parseInt(tokens[i]);
-                }
-                return new ArrayParameter(this, array);
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new ArrayParameter(this, (int[]) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
@@ -261,31 +264,16 @@ public class ParameterFactory {
                     this.array = array;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return array;
                 }
 
-                public String valueAsString() {
-                    StringBuilder builder = new StringBuilder("{");
-                    for (int i = 0; i < array.length; i++) {
-                        builder.append(array[i]);
-                        if (i < array.length - 1) {
-                            builder.append(", ");
-                        }
-                    }
-                    return builder.append("}").toString();
+                public Object getValueForSerialization() {
+                    return array;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                String[] tokens = new String[0];
-                if (valueString.contains(", ")) {
-                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
-                }
-                boolean[] array = new boolean[tokens.length];
-                for (int i = 0; i < tokens.length; i++) {
-                    array[i] = Boolean.parseBoolean(tokens[i]);
-                }
-                return new ArrayParameter(this, array);
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new ArrayParameter(this, (boolean[]) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
@@ -302,31 +290,16 @@ public class ParameterFactory {
                     this.array = array;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return array;
                 }
 
-                public String valueAsString() {
-                    StringBuilder builder = new StringBuilder("{");
-                    for (int i = 0; i < array.length; i++) {
-                        builder.append(array[i]);
-                        if (i < array.length - 1) {
-                            builder.append(", ");
-                        }
-                    }
-                    return builder.append("}").toString();
+                public Object getValueForSerialization() {
+                    return array;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                String[] tokens = new String[0];
-                if (valueString.contains(", ")) {
-                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
-                }
-                Integer[] array = new Integer[tokens.length];
-                for (int i = 0; i < tokens.length; i++) {
-                    array[i] = new Integer(tokens[i]);
-                }
-                return new ArrayParameter(this, array);
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new ArrayParameter(this, (Integer[]) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
@@ -343,31 +316,16 @@ public class ParameterFactory {
                     this.array = array;
                 }
 
-                public Object getValue(PlaybackState playbackState) {
+                public Object getValueForPlayback(PlaybackState playbackState) {
                     return array;
                 }
 
-                public String valueAsString() {
-                    StringBuilder builder = new StringBuilder("{");
-                    for (int i = 0; i < array.length; i++) {
-                        builder.append(array[i]);
-                        if (i < array.length - 1) {
-                            builder.append(", ");
-                        }
-                    }
-                    return builder.append("}").toString();
+                public Object getValueForSerialization() {
+                    return array;
                 }
             }
-            public Parameter fromStrings(String typeString, String valueString) {
-                String[] tokens = new String[0];
-                if (valueString.contains(", ")) {
-                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
-                }
-                Boolean[] array = new Boolean[tokens.length];
-                for (int i = 0; i < tokens.length; i++) {
-                    array[i] = Boolean.valueOf(tokens[i]);
-                }
-                return new ArrayParameter(this, array);
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new ArrayParameter(this, (Boolean[]) serializedValue);
             }
 
             public Parameter fromObject(Object entity) {

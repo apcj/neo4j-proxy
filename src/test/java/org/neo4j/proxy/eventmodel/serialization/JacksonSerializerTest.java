@@ -19,11 +19,18 @@
  */
 package org.neo4j.proxy.eventmodel.serialization;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.POJONode;
 import org.junit.Test;
 import org.neo4j.proxy.eventmodel.Event;
 import org.neo4j.proxy.eventmodel.Parameter;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
@@ -64,6 +71,28 @@ public class JacksonSerializerTest {
         new JacksonSerializer(printWriter).flush();
 
         verify(printWriter).flush();
+    }
+
+    @Test
+    public void shouldDoStuffWithString() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        StringWriter stringWriter = new StringWriter();
+        objectMapper.writeValue(stringWriter, 123);
+        objectMapper.writeValue(stringWriter, new int[] {1, 2, 3});
+        objectMapper.writeValue(stringWriter, "Hello\nThere");
+        System.out.println("stringWriter = " + stringWriter);
+    }
+
+    @Test
+    public void shouldDoStuffWithPojo() throws IOException {
+
+        ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+        objectNode.put("hello", new ObjectMapper().valueToTree(new int[]{1, 2, 3}));
+        objectNode.put("goodbye", new ObjectMapper().valueToTree("Foo"));
+        System.out.println("objectNode = " + objectNode);
+
+        JsonNode jsonNode = new ObjectMapper().valueToTree(new int[]{1, 2, 3});
+        System.out.println("jsonNode = " + jsonNode.getClass());
     }
 
 }
