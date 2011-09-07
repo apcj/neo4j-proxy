@@ -61,7 +61,7 @@ public class JacksonSerializerTest {
     {
         PrintWriter printWriter = mock(PrintWriter.class);
 
-        new TextSerializer(printWriter).flush();
+        new JacksonSerializer(printWriter).flush();
 
         verify(printWriter).flush();
     }

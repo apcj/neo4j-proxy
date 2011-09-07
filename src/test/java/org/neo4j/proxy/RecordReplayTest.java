@@ -27,8 +27,6 @@ import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 import org.neo4j.proxy.eventmodel.Event;
 import org.neo4j.proxy.eventmodel.serialization.JacksonDeserializer;
 import org.neo4j.proxy.eventmodel.serialization.JacksonSerializer;
-import org.neo4j.proxy.eventmodel.serialization.TextDeserializer;
-import org.neo4j.proxy.eventmodel.serialization.TextSerializer;
 import org.neo4j.proxy.playback.PlaybackDriver;
 import org.neo4j.proxy.recording.RecordingGraphDatabase;
 

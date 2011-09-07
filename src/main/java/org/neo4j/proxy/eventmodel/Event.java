@@ -19,11 +19,7 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor;
-
 import java.util.Arrays;
-
-import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.serialize;
 
 public class Event {
     private Parameter target;
@@ -46,25 +42,6 @@ public class Event {
 
     public Parameter[] getParameters() {
         return parameters;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(serialize(target)).append(" ").append(methodName);
-        for (Parameter parameter : parameters) {
-            builder.append(" ").append(serialize(parameter));
-        }
-        return builder.toString();
-    }
-
-    public static Event parse(String string) {
-        String[] tokens = string.split(" ");
-        Parameter[] parameters = new Parameter[tokens.length - 2];
-        for (int i = 2; i < tokens.length; i++) {
-            parameters[i - 2] = ParameterStringAdaptor.parse(tokens[i]);
-        }
-        return new Event(ParameterStringAdaptor.parse(tokens[0]), tokens[1], parameters);
     }
 
     @Override

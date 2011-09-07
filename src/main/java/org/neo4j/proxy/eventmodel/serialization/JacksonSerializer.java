@@ -77,7 +77,7 @@ public class JacksonSerializer implements RecordingGraphDatabase.Listener {
         return arrayNode;
     }
 
-    private static Parameter[] parseArguments(JsonNode arguments) {
+    public static Parameter[] parseArguments(JsonNode arguments) {
         Iterator<JsonNode> elements = arguments.getElements();
         List<Parameter> parameters = new ArrayList<Parameter>();
         while (elements.hasNext()) {
@@ -86,14 +86,14 @@ public class JacksonSerializer implements RecordingGraphDatabase.Listener {
         return parameters.toArray(new Parameter[parameters.size()]);
     }
 
-    private static JsonNode serializeParameter(Parameter argument) {
+    public static JsonNode serializeParameter(Parameter argument) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("type", argument.getType().getWrappedType().getSimpleName());
         node.put("value", argument.valueAsString());
         return node;
     }
 
-    private static Parameter parseParameter(JsonNode jsonNode) {
+    public static Parameter parseParameter(JsonNode jsonNode) {
         String typeName = jsonNode.get("type").getTextValue();
         String value = jsonNode.get("value").getTextValue();
         for (ParameterType type : ParameterFactory.types) {

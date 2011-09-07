@@ -22,13 +22,11 @@ package org.neo4j.proxy.eventmodel;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.proxy.eventmodel.ParameterFactory.fromObject;
-import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.parse;
-import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.serialize;
+import static org.neo4j.proxy.eventmodel.serialization.JacksonSerializer.parseParameter;
+import static org.neo4j.proxy.eventmodel.serialization.JacksonSerializer.serializeParameter;
 
 public class ParameterFactoryTest {
 
@@ -50,17 +48,17 @@ public class ParameterFactoryTest {
 
     private void assertCanRoundTrip(Object object) {
         assertEquals(object, fromObject(object).getValue(null));
-        assertEquals(object, parse(serialize(fromObject(object))).getValue(null));
+        assertEquals(object, parseParameter(serializeParameter(fromObject(object))).getValue(null));
     }
 
     private void assertCanRoundTripArray(int[] array) {
         assertArrayEquals(array, (int[]) fromObject(array).getValue(null));
-        assertArrayEquals(array, (int[]) parse(serialize(fromObject(array))).getValue(null));
+        assertArrayEquals(array, (int[]) parseParameter(serializeParameter(fromObject(array))).getValue(null));
     }
 
     private void assertCanRoundTripArray(boolean[] array) {
         assertBooleanArrayEquals(array, (boolean[]) fromObject(array).getValue(null));
-        assertBooleanArrayEquals(array, (boolean[]) parse(serialize(fromObject(array))).getValue(null));
+        assertBooleanArrayEquals(array, (boolean[]) parseParameter(serializeParameter(fromObject(array))).getValue(null));
     }
 
     private void assertBooleanArrayEquals(boolean[] expected, boolean[] actual) {
@@ -72,6 +70,6 @@ public class ParameterFactoryTest {
 
     private void assertCanRoundTripArray(Object[] array) {
         assertArrayEquals(array, (Object[]) fromObject(array).getValue(null));
-        assertArrayEquals(array, (Object[]) parse(serialize(fromObject(array))).getValue(null));
+        assertArrayEquals(array, (Object[]) parseParameter(serializeParameter(fromObject(array))).getValue(null));
     }
 }
