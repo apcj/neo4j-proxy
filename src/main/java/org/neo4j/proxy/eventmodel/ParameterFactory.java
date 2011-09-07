@@ -333,6 +333,47 @@ public class ParameterFactory {
                 return new ArrayParameter(this, (Integer[]) entity);
             }
         });
+        types.add(new BaseParameterType(Boolean[].class) {
+
+            class ArrayParameter extends BaseParameter {
+                private Boolean[] array;
+
+                ArrayParameter(ParameterType type, Boolean[] array) {
+                    super(type);
+                    this.array = array;
+                }
+
+                public Object getValue(PlaybackState playbackState) {
+                    return array;
+                }
+
+                public String valueAsString() {
+                    StringBuilder builder = new StringBuilder("{");
+                    for (int i = 0; i < array.length; i++) {
+                        builder.append(array[i]);
+                        if (i < array.length - 1) {
+                            builder.append(", ");
+                        }
+                    }
+                    return builder.append("}").toString();
+                }
+            }
+            public Parameter fromStrings(String typeString, String valueString) {
+                String[] tokens = new String[0];
+                if (valueString.contains(", ")) {
+                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
+                }
+                Boolean[] array = new Boolean[tokens.length];
+                for (int i = 0; i < tokens.length; i++) {
+                    array[i] = Boolean.valueOf(tokens[i]);
+                }
+                return new ArrayParameter(this, array);
+            }
+
+            public Parameter fromObject(Object entity) {
+                return new ArrayParameter(this, (Boolean[]) entity);
+            }
+        });
     }
     public static Parameter fromObject(Object argument) {
         for (ParameterType type : types) {

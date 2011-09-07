@@ -45,6 +45,7 @@ public class ParameterFactoryTest {
         assertCanRoundTripArray(new int[]{1, 2, 3});
         assertCanRoundTripArray(new Integer[]{1, 2, 3});
         assertCanRoundTripArray(new boolean[]{true, false, true});
+        assertCanRoundTripArray(new Boolean[]{true, false, true});
     }
 
     private void assertCanRoundTrip(Object object) {
