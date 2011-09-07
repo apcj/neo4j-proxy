@@ -21,10 +21,12 @@ package org.neo4j.proxy.eventmodel;
 
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.neo4j.proxy.eventmodel.ParameterFactory.fromObject;
+import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.parse;
+import static org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor.serialize;
 
 public class ParameterFactoryTest {
 
@@ -39,15 +41,21 @@ public class ParameterFactoryTest {
     {
         assertCanRoundTripArray(new int[]{});
         assertCanRoundTripArray(new int[]{1, 2, 3});
+//        assertCanRoundTripArray(new Integer[]{1, 2, 3});
     }
 
     private void assertCanRoundTrip(Object object) {
-        assertEquals(object, ParameterFactory.fromObject(object).getValue(null));
-        assertEquals(object, ParameterStringAdaptor.parse(ParameterStringAdaptor.serialize(ParameterFactory.fromObject(object))).getValue(null));
+        assertEquals(object, fromObject(object).getValue(null));
+        assertEquals(object, parse(serialize(fromObject(object))).getValue(null));
     }
 
     private void assertCanRoundTripArray(int[] array) {
-        assertArrayEquals(array, (int[]) ParameterFactory.fromObject(array).getValue(null));
-        assertArrayEquals(array, (int[]) ParameterStringAdaptor.parse(ParameterStringAdaptor.serialize(ParameterFactory.fromObject(array))).getValue(null));
+        assertArrayEquals(array, (int[]) fromObject(array).getValue(null));
+        assertArrayEquals(array, (int[]) parse(serialize(fromObject(array))).getValue(null));
+    }
+
+    private void assertCanRoundTripArray(Object[] array) {
+        assertArrayEquals(array, (Object[]) fromObject(array).getValue(null));
+        assertArrayEquals(array, (Object[]) parse(serialize(fromObject(array))).getValue(null));
     }
 }

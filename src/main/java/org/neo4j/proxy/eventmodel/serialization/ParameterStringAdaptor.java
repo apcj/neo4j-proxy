@@ -20,6 +20,7 @@
 package org.neo4j.proxy.eventmodel.serialization;
 
 import org.neo4j.proxy.eventmodel.Parameter;
+import org.neo4j.proxy.eventmodel.ParameterFactory;
 import org.neo4j.proxy.eventmodel.ParameterType;
 
 import java.util.regex.Matcher;
@@ -34,7 +35,7 @@ public class ParameterStringAdaptor {
         matcher.find();
         String typeName = matcher.group(1);
         String value = matcher.group(2);
-        for (ParameterType type : ParameterType.Types.values()) {
+        for (ParameterType type : ParameterFactory.types) {
             if (type.acceptTypeName(typeName)) {
                 return type.fromStrings(typeName, value);
             }
