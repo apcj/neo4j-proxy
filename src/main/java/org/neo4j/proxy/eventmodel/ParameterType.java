@@ -171,6 +171,41 @@ public interface ParameterType {
                 return new RelationshipTypeParameter(((org.neo4j.graphdb.RelationshipType) entity).name());
             }
         },
+        Direction {
+            public boolean acceptTypeName(String typeString) {
+                return "Direction".equals(typeString);
+            }
+            public boolean acceptObject(Object object) {
+                return object instanceof org.neo4j.graphdb.Direction;
+            }
+
+            class DirectionParameter implements Parameter {
+                private org.neo4j.graphdb.Direction direction;
+
+                DirectionParameter(org.neo4j.graphdb.Direction direction) {
+                    this.direction = direction;
+                }
+
+                public Object getValue(PlaybackState playbackState) {
+                    return direction;
+                }
+
+                public Class apiClass() {
+                    return RelationshipType.class;
+                }
+
+                public String valueAsString() {
+                    return direction.name();
+                }
+            }
+            public Parameter fromStrings(String typeString, String valueString) {
+                return new DirectionParameter(org.neo4j.graphdb.Direction.valueOf(valueString));
+            }
+
+            public Parameter fromObject(Object entity) {
+                return new DirectionParameter((org.neo4j.graphdb.Direction) entity);
+            }
+        },
         String {
             public boolean acceptTypeName(String typeString) {
                 return "String".equals(typeString);
