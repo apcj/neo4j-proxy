@@ -33,4 +33,22 @@ public abstract class BaseParameter implements Parameter {
     public ParameterType getType() {
         return type;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseParameter)) return false;
+
+        BaseParameter that = (BaseParameter) o;
+
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        if (valueAsString() != null ? !valueAsString().equals(that.valueAsString()) : that.valueAsString() != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return type != null ? type.hashCode() : 0;
+    }
 }

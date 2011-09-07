@@ -25,6 +25,8 @@ import org.neo4j.graphdb.*;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 import org.neo4j.proxy.eventmodel.Event;
+import org.neo4j.proxy.eventmodel.serialization.JacksonDeserializer;
+import org.neo4j.proxy.eventmodel.serialization.JacksonSerializer;
 import org.neo4j.proxy.eventmodel.serialization.TextDeserializer;
 import org.neo4j.proxy.eventmodel.serialization.TextSerializer;
 import org.neo4j.proxy.playback.PlaybackDriver;
@@ -56,13 +58,13 @@ public class RecordReplayTest {
     {
         String recordedStoreDir = "target/recordedDatabase";
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        TextSerializer serializer = new TextSerializer(new PrintWriter(byteArrayOutputStream));
+        JacksonSerializer serializer = new JacksonSerializer(new PrintWriter(byteArrayOutputStream));
         writeToDatabase(recordedStoreDir, serializer);
         serializer.flush();
         makeAssertionsAboutTheData(recordedStoreDir);
 
         String playbackStoreDir = "target/playbackDatabase";
-        playbackToDifferentDatabase(new TextDeserializer(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())))), playbackStoreDir);
+        playbackToDifferentDatabase(new JacksonDeserializer(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())))), playbackStoreDir);
         makeAssertionsAboutTheData(playbackStoreDir);
     }
 
@@ -70,9 +72,9 @@ public class RecordReplayTest {
     public void printEventsToConsole()
     {
         String recordedStoreDir = "target/recordedDatabase";
-        TextSerializer textSerializer = new TextSerializer(new PrintWriter(System.out));
-        writeToDatabase(recordedStoreDir, textSerializer);
-        textSerializer.flush();
+        JacksonSerializer serializer = new JacksonSerializer(new PrintWriter(System.out));
+        writeToDatabase(recordedStoreDir, serializer);
+        serializer.flush();
     }
 
     private void makeAssertionsAboutTheData(String playbackStoreDir) {
