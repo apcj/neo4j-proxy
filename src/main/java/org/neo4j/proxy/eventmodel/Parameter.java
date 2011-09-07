@@ -23,9 +23,9 @@ import org.neo4j.proxy.playback.PlaybackState;
 
 public interface Parameter {
 
-    public abstract Object getValue(PlaybackState playbackState);
+    ParameterType getType();
 
-    Class apiClass();
+    Object getValue(PlaybackState playbackState);
 
     String valueAsString();
 }

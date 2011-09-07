@@ -44,6 +44,6 @@ public class ParameterStringAdaptor {
     }
 
     public static String serialize(Parameter parameter) {
-        return String.format("%s(%s)", parameter.apiClass().getSimpleName(), parameter.valueAsString());
+        return String.format("%s(%s)", parameter.getType().getWrappedType().getSimpleName(), parameter.valueAsString());
     }
 }

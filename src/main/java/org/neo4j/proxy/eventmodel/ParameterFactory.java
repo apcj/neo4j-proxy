@@ -19,10 +19,9 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
+import org.neo4j.proxy.eventmodel.parameters.BaseParameter;
+import org.neo4j.proxy.eventmodel.parameters.BaseParameterType;
 import org.neo4j.proxy.playback.PlaybackState;
 
 import java.util.ArrayList;
@@ -32,80 +31,60 @@ public class ParameterFactory {
 
     public static final List<ParameterType> types = new ArrayList<ParameterType>();
     static {
-        types.add(new ParameterType() {
-            public boolean acceptTypeName(String typeString) {
-                return "GraphDatabaseService".equals(typeString);
-            }
+        types.add(new BaseParameterType(GraphDatabaseService.class) {
 
-            public boolean acceptObject(Object object) {
-                return object instanceof GraphDatabaseService;
-            }
+            class GraphDatabaseServiceParameter extends BaseParameter {
+                protected GraphDatabaseServiceParameter(ParameterType type) {
+                    super(type);
+                }
 
-            class GraphDatabaseServiceParameter implements Parameter {
                 public Object getValue(PlaybackState playbackState) {
                     return playbackState.getGraphDatabase();
                 }
 
-                public Class apiClass() {
-                    return GraphDatabaseService.class;
-                }
-
                 public String valueAsString() {
                     return "";
                 }
             }
 
             public Parameter fromStrings(String typeString, String valueString) {
-                return new GraphDatabaseServiceParameter();
+                return new GraphDatabaseServiceParameter(this);
             }
 
             public Parameter fromObject(Object entity) {
-                return new GraphDatabaseServiceParameter();
+                return new GraphDatabaseServiceParameter(this);
             }
         });
-        types.add(new ParameterType() {
-            public boolean acceptTypeName(String typeString) {
-                return "Transaction".equals(typeString);
-            }
+        types.add(new BaseParameterType(Transaction.class) {
 
-            public boolean acceptObject(Object object) {
-                return object instanceof Transaction;
-            }
+            class TransactionParameter extends BaseParameter {
+                protected TransactionParameter(ParameterType type) {
+                    super(type);
+                }
 
-            class TransactionParameter implements Parameter {
                 public Object getValue(PlaybackState playbackState) {
                     return playbackState.getCurrentTransaction();
                 }
 
-                public Class apiClass() {
-                    return Transaction.class;
-                }
-
                 public String valueAsString() {
                     return "";
                 }
             }
             public Parameter fromStrings(String typeString, String valueString) {
-                return new TransactionParameter();
+                return new TransactionParameter(this);
             }
 
             public Parameter fromObject(Object entity) {
-                return new TransactionParameter();
+                return new TransactionParameter(this);
             }
         });
-        types.add(new ParameterType() {
-            public boolean acceptTypeName(String typeString) {
-                return "Node".equals(typeString);
-            }
+        types.add(new BaseParameterType(Node.class) {
 
-            public boolean acceptObject(Object object) {
-                return object instanceof Node;
-            }
-
-            class NodeParameter implements Parameter {
+            class NodeParameter extends BaseParameter {
                 private long id;
 
-                public NodeParameter(long id) {
+                public NodeParameter(ParameterType type, long id) {
+                    super(type);
                     this.id = id;
                 }
 
@@ -113,34 +92,25 @@ public class ParameterFactory {
                     return playbackState.getNodeCache().get(id);
                 }
 
-                public Class apiClass() {
-                    return Node.class;
-                }
-
                 public String valueAsString() {
                     return java.lang.String.valueOf(id);
                 }
             }
             public Parameter fromStrings(String typeString, String valueString) {
-                return new NodeParameter(Long.parseLong(valueString));
+                return new NodeParameter(this, Long.parseLong(valueString));
             }
 
             public Parameter fromObject(Object entity) {
-                return new NodeParameter(((Node) entity).getId());
+                return new NodeParameter(this, ((Node) entity).getId());
             }
         });
-        types.add(new ParameterType() {
-            public boolean acceptTypeName(String typeString) {
-                return "RelationshipType".equals(typeString);
-            }
-            public boolean acceptObject(Object object) {
-                return object instanceof org.neo4j.graphdb.RelationshipType;
-            }
+        types.add(new BaseParameterType(RelationshipType.class) {
 
-            class RelationshipTypeParameter implements Parameter, org.neo4j.graphdb.RelationshipType {
+            class RelationshipTypeParameter extends BaseParameter implements RelationshipType {
                 private String name;
 
-                RelationshipTypeParameter(String name) {
+                RelationshipTypeParameter(ParameterType type, String name) {
+                    super(type);
                     this.name = name;
                 }
 
@@ -152,34 +122,25 @@ public class ParameterFactory {
                     return name;
                 }
 
-                public Class apiClass() {
-                    return RelationshipType.class;
-                }
-
                 public String valueAsString() {
                     return "\"" + name + "\"";
                 }
             }
             public Parameter fromStrings(String typeString, String valueString) {
-                return new RelationshipTypeParameter(valueString.substring(1, valueString.length() - 1));
+                return new RelationshipTypeParameter(this, valueString.substring(1, valueString.length() - 1));
             }
 
             public Parameter fromObject(Object entity) {
-                return new RelationshipTypeParameter(((org.neo4j.graphdb.RelationshipType) entity).name());
+                return new RelationshipTypeParameter(this, ((org.neo4j.graphdb.RelationshipType) entity).name());
             }
         });
-        types.add(new ParameterType() {
-            public boolean acceptTypeName(String typeString) {
-                return "Direction".equals(typeString);
-            }
-            public boolean acceptObject(Object object) {
-                return object instanceof org.neo4j.graphdb.Direction;
-            }
+        types.add(new BaseParameterType(Direction.class) {
 
-            class DirectionParameter implements Parameter {
+            class DirectionParameter extends BaseParameter {
                 private org.neo4j.graphdb.Direction direction;
 
-                DirectionParameter(org.neo4j.graphdb.Direction direction) {
+                DirectionParameter(ParameterType type, Direction direction) {
+                    super(type);
                     this.direction = direction;
                 }
 
@@ -187,44 +148,30 @@ public class ParameterFactory {
                     return direction;
                 }
 
-                public Class apiClass() {
-                    return org.neo4j.graphdb.Direction.class;
-                }
-
                 public String valueAsString() {
                     return direction.name();
                 }
             }
             public Parameter fromStrings(String typeString, String valueString) {
-                return new DirectionParameter(org.neo4j.graphdb.Direction.valueOf(valueString));
+                return new DirectionParameter(this, org.neo4j.graphdb.Direction.valueOf(valueString));
             }
 
             public Parameter fromObject(Object entity) {
-                return new DirectionParameter((org.neo4j.graphdb.Direction) entity);
+                return new DirectionParameter(this, (org.neo4j.graphdb.Direction) entity);
             }
         });
-        types.add(new ParameterType() {
-            public boolean acceptTypeName(String typeString) {
-                return "String".equals(typeString);
-            }
+        types.add(new BaseParameterType(String.class) {
 
-            public boolean acceptObject(Object object) {
-                return object instanceof String;
-            }
-
-            class StringParameter implements Parameter {
+            class StringParameter extends BaseParameter {
                 private String value;
 
-                public StringParameter(String value) {
+                public StringParameter(ParameterType type, String value) {
+                    super(type);
                     this.value = value;
                 }
 
                 public Object getValue(PlaybackState playbackState) {
                     return value;
-                }
-
-                public Class apiClass() {
-                    return String.class;
                 }
 
                 public String valueAsString() {
@@ -232,26 +179,20 @@ public class ParameterFactory {
                 }
             }
             public Parameter fromStrings(String typeString, String valueString) {
-                return new StringParameter(valueString.substring(1, valueString.length() - 1));
+                return new StringParameter(this, valueString.substring(1, valueString.length() - 1));
             }
 
             public Parameter fromObject(Object entity) {
-                return new StringParameter((String) entity);
+                return new StringParameter(this, (String) entity);
             }
         });
-        types.add(new ParameterType() {
-            public boolean acceptTypeName(String typeString) {
-                return "Integer".equals(typeString);
-            }
+        types.add(new BaseParameterType(Integer.class) {
 
-            public boolean acceptObject(Object object) {
-                return object instanceof Integer;
-            }
-
-            class IntegerParameter implements Parameter {
+            class IntegerParameter extends BaseParameter {
                 private int value;
 
-                IntegerParameter(int value) {
+                IntegerParameter(ParameterType type, int value) {
+                    super(type);
                     this.value = value;
                 }
 
@@ -259,23 +200,19 @@ public class ParameterFactory {
                     return value;
                 }
 
-                public Class apiClass() {
-                    return Integer.class;
-                }
-
                 public String valueAsString() {
                     return java.lang.String.valueOf(value);
                 }
             }
             public Parameter fromStrings(String typeString, String valueString) {
-                return new IntegerParameter(java.lang.Integer.parseInt(valueString));
+                return new IntegerParameter(this, java.lang.Integer.parseInt(valueString));
             }
 
             public Parameter fromObject(Object entity) {
-                return new IntegerParameter((Integer) entity);
+                return new IntegerParameter(this, (Integer) entity);
             }
         });
-        types.add(new ParameterType() {
+        types.add(new BaseParameterType(int[].class) {
             public boolean acceptTypeName(String typeString) {
                 return typeString.endsWith("[]");
             }
@@ -284,19 +221,16 @@ public class ParameterFactory {
                 return object instanceof int[];
             }
 
-            class ArrayParameter implements Parameter {
+            class ArrayParameter extends BaseParameter {
                 private int[] array;
 
-                ArrayParameter(int[] array) {
+                ArrayParameter(ParameterType type, int[] array) {
+                    super(type);
                     this.array = array;
                 }
 
                 public Object getValue(PlaybackState playbackState) {
                     return array;
-                }
-
-                public Class apiClass() {
-                    return int[].class;
                 }
 
                 public String valueAsString() {
@@ -319,11 +253,11 @@ public class ParameterFactory {
                 for (int i = 0; i < tokens.length; i++) {
                     array[i] = java.lang.Integer.parseInt(tokens[i]);
                 }
-                return new ArrayParameter(array);
+                return new ArrayParameter(this, array);
             }
 
             public Parameter fromObject(Object entity) {
-                return new ArrayParameter((int[]) entity);
+                return new ArrayParameter(this, (int[]) entity);
             }
         });
     }

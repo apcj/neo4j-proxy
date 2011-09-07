@@ -42,7 +42,7 @@ public class ParameterTest {
     @Test
     public void shouldParseNode() throws Exception {
         Parameter parameter = ParameterStringAdaptor.parse("Node(13)");
-        assertEquals(Node.class, parameter.apiClass());
+        assertEquals(Node.class, parameter.getType().getWrappedType());
     }
 
     @Test
