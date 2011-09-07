@@ -21,7 +21,9 @@ package org.neo4j.proxy.eventmodel;
 
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.proxy.eventmodel.serialization.ParameterStringAdaptor;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class ParameterFactoryTest {
@@ -32,7 +34,20 @@ public class ParameterFactoryTest {
         assertCanRoundTrip(Direction.OUTGOING);
     }
 
+    @Test
+    public void shouldAcceptArrays()
+    {
+        assertCanRoundTripArray(new int[]{});
+        assertCanRoundTripArray(new int[]{1, 2, 3});
+    }
+
     private void assertCanRoundTrip(Object object) {
         assertEquals(object, ParameterFactory.fromObject(object).getValue(null));
+        assertEquals(object, ParameterStringAdaptor.parse(ParameterStringAdaptor.serialize(ParameterFactory.fromObject(object))).getValue(null));
+    }
+
+    private void assertCanRoundTripArray(int[] array) {
+        assertArrayEquals(array, (int[]) ParameterFactory.fromObject(array).getValue(null));
+        assertArrayEquals(array, (int[]) ParameterStringAdaptor.parse(ParameterStringAdaptor.serialize(ParameterFactory.fromObject(array))).getValue(null));
     }
 }

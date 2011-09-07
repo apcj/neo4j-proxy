@@ -20,13 +20,16 @@
 package org.neo4j.proxy.eventmodel;
 
 import com.sun.org.apache.bcel.internal.generic.RETURN;
+import com.sun.tools.internal.ws.processor.model.java.JavaArrayType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.playback.PlaybackState;
+import sun.text.normalizer.IntTrie;
 
 import javax.tools.JavaCompiler;
+import java.util.Arrays;
 
 public interface ParameterType {
     boolean acceptTypeName(String typeString);
@@ -191,7 +194,7 @@ public interface ParameterType {
                 }
 
                 public Class apiClass() {
-                    return RelationshipType.class;
+                    return org.neo4j.graphdb.Direction.class;
                 }
 
                 public String valueAsString() {
@@ -276,6 +279,57 @@ public interface ParameterType {
 
             public Parameter fromObject(Object entity) {
                 return new IntegerParameter((Integer) entity);
+            }
+        },
+        Array {
+            public boolean acceptTypeName(String typeString) {
+                return typeString.endsWith("[]");
+            }
+
+            public boolean acceptObject(Object object) {
+                return object instanceof int[];
+            }
+
+            class ArrayParameter implements Parameter {
+                private int[] array;
+
+                ArrayParameter(int[] array) {
+                    this.array = array;
+                }
+
+                public Object getValue(PlaybackState playbackState) {
+                    return array;
+                }
+
+                public Class apiClass() {
+                    return int[].class;
+                }
+
+                public String valueAsString() {
+                    StringBuilder builder = new StringBuilder("{");
+                    for (int i = 0; i < array.length; i++) {
+                        builder.append(array[i]);
+                        if (i < array.length - 1) {
+                            builder.append(", ");
+                        }
+                    }
+                    return builder.append("}").toString();
+                }
+            }
+            public Parameter fromStrings(String typeString, String valueString) {
+                String[] tokens = new String[0];
+                if (valueString.contains(", ")) {
+                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
+                }
+                int[] array = new int[tokens.length];
+                for (int i = 0; i < tokens.length; i++) {
+                    array[i] = java.lang.Integer.parseInt(tokens[i]);
+                }
+                return new ArrayParameter(array);
+            }
+
+            public Parameter fromObject(Object entity) {
+                return new ArrayParameter((int[]) entity);
             }
         }
     }
