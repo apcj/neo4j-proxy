@@ -213,14 +213,6 @@ public class ParameterFactory {
             }
         });
         types.add(new BaseParameterType(int[].class) {
-            public boolean acceptTypeName(String typeString) {
-                return typeString.endsWith("[]");
-            }
-
-            public boolean acceptObject(Object object) {
-                return object instanceof int[];
-            }
-
             class ArrayParameter extends BaseParameter {
                 private int[] array;
 
@@ -251,13 +243,54 @@ public class ParameterFactory {
                 }
                 int[] array = new int[tokens.length];
                 for (int i = 0; i < tokens.length; i++) {
-                    array[i] = java.lang.Integer.parseInt(tokens[i]);
+                    array[i] = Integer.parseInt(tokens[i]);
                 }
                 return new ArrayParameter(this, array);
             }
 
             public Parameter fromObject(Object entity) {
                 return new ArrayParameter(this, (int[]) entity);
+            }
+        });
+        types.add(new BaseParameterType(Integer[].class) {
+
+            class ArrayParameter extends BaseParameter {
+                private Integer[] array;
+
+                ArrayParameter(ParameterType type, Integer[] array) {
+                    super(type);
+                    this.array = array;
+                }
+
+                public Object getValue(PlaybackState playbackState) {
+                    return array;
+                }
+
+                public String valueAsString() {
+                    StringBuilder builder = new StringBuilder("{");
+                    for (int i = 0; i < array.length; i++) {
+                        builder.append(array[i]);
+                        if (i < array.length - 1) {
+                            builder.append(", ");
+                        }
+                    }
+                    return builder.append("}").toString();
+                }
+            }
+            public Parameter fromStrings(String typeString, String valueString) {
+                String[] tokens = new String[0];
+                if (valueString.contains(", ")) {
+                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
+                }
+                Integer[] array = new Integer[tokens.length];
+                for (int i = 0; i < tokens.length; i++) {
+                    array[i] = new Integer(tokens[i]);
+                }
+                return new ArrayParameter(this, array);
+            }
+
+            public Parameter fromObject(Object entity) {
+                return new ArrayParameter(this, (Integer[]) entity);
             }
         });
     }
