@@ -37,6 +37,12 @@ public class ParameterFactoryTest {
     }
 
     @Test
+    public void shouldAcceptAllPrimitiveTypes()
+    {
+        assertCanRoundTrip(12l);
+    }
+
+    @Test
     public void shouldAcceptArrays()
     {
         assertCanRoundTripArray(new int[]{});

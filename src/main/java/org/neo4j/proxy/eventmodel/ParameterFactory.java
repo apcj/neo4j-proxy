@@ -178,32 +178,6 @@ public class ParameterFactory {
                 return new DirectionParameter(this, (org.neo4j.graphdb.Direction) entity);
             }
         });
-        types.add(new BaseParameterType(String.class) {
-
-            class StringParameter extends BaseParameter {
-                private String value;
-
-                public StringParameter(ParameterType type, String value) {
-                    super(type);
-                    this.value = value;
-                }
-
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return value;
-                }
-
-                public Object getValueForSerialization() {
-                    return value;
-                }
-            }
-            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new StringParameter(this, (String) serializedValue);
-            }
-
-            public Parameter fromObject(Object entity) {
-                return new StringParameter(this, (String) entity);
-            }
-        });
         types.add(new BaseParameterType(Integer.class) {
 
             class IntegerParameter extends BaseParameter {
@@ -332,7 +306,60 @@ public class ParameterFactory {
                 return new ArrayParameter(this, (Boolean[]) entity);
             }
         });
+        types.add(new PrimitiveParameterType(String.class));
+        types.add(new PrimitiveParameterType(Long.class));
     }
+
+    private static class PrimitiveParameterType extends BaseParameterType {
+        public PrimitiveParameterType(Class primitiveType) {
+            super(primitiveType);
+        }
+
+        class PrimitiveParameter implements Parameter {
+
+            private Object value;
+
+            PrimitiveParameter(Object value) {
+                this.value = value;
+            }
+
+            public ParameterType getType() {
+                return PrimitiveParameterType.this;
+            }
+
+            public Object getValueForPlayback(PlaybackState playbackState) {
+                return value;
+            }
+
+            public Object getValueForSerialization() {
+                return value;
+            }
+
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+
+                PrimitiveParameter that = (PrimitiveParameter) o;
+
+                if (value != null ? !value.equals(that.value) : that.value != null) return false;
+
+                return true;
+            }
+
+            public int hashCode() {
+                return value != null ? value.hashCode() : 0;
+            }
+        }
+
+        public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+            return new PrimitiveParameter(serializedValue);
+        }
+
+        public Parameter fromObject(Object entity) {
+            return new PrimitiveParameter(entity);
+        }
+    }
+
     public static Parameter fromObject(Object argument) {
         for (ParameterType type : types) {
             if (type.acceptObject(argument)) {
