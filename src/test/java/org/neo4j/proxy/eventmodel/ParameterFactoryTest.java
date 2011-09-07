@@ -25,8 +25,8 @@ import org.neo4j.graphdb.Direction;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.proxy.eventmodel.ParameterFactory.fromObject;
-import static org.neo4j.proxy.eventmodel.serialization.JacksonSerializer.parseParameter;
-import static org.neo4j.proxy.eventmodel.serialization.JacksonSerializer.serializeParameter;
+import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.parseParameter;
+import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeParameter;
 
 public class ParameterFactoryTest {
 

@@ -63,7 +63,7 @@ public class JacksonDeserializer implements Iterable<Event> {
                 }
                 Event event = null;
                 try {
-                    event = JacksonSerializer.parseEvent(mapper.readTree(line));
+                    event = JacksonAdaptor.parseEvent(mapper.readTree(line));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

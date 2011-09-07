@@ -31,8 +31,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.neo4j.proxy.eventmodel.FakeNode.node;
 import static org.neo4j.proxy.eventmodel.ParameterFactory.fromObject;
-import static org.neo4j.proxy.eventmodel.serialization.JacksonSerializer.parseEvent;
-import static org.neo4j.proxy.eventmodel.serialization.JacksonSerializer.serializeEvent;
+import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.parseEvent;
+import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeEvent;
 
 public class JacksonSerializerTest {
 
