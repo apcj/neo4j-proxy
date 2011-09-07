@@ -252,6 +252,46 @@ public class ParameterFactory {
                 return new ArrayParameter(this, (int[]) entity);
             }
         });
+        types.add(new BaseParameterType(boolean[].class) {
+            class ArrayParameter extends BaseParameter {
+                private boolean[] array;
+
+                ArrayParameter(ParameterType type, boolean[] array) {
+                    super(type);
+                    this.array = array;
+                }
+
+                public Object getValue(PlaybackState playbackState) {
+                    return array;
+                }
+
+                public String valueAsString() {
+                    StringBuilder builder = new StringBuilder("{");
+                    for (int i = 0; i < array.length; i++) {
+                        builder.append(array[i]);
+                        if (i < array.length - 1) {
+                            builder.append(", ");
+                        }
+                    }
+                    return builder.append("}").toString();
+                }
+            }
+            public Parameter fromStrings(String typeString, String valueString) {
+                String[] tokens = new String[0];
+                if (valueString.contains(", ")) {
+                    tokens = valueString.substring(1, valueString.length() - 1).split(", ");
+                }
+                boolean[] array = new boolean[tokens.length];
+                for (int i = 0; i < tokens.length; i++) {
+                    array[i] = Boolean.parseBoolean(tokens[i]);
+                }
+                return new ArrayParameter(this, array);
+            }
+
+            public Parameter fromObject(Object entity) {
+                return new ArrayParameter(this, (boolean[]) entity);
+            }
+        });
         types.add(new BaseParameterType(Integer[].class) {
 
             class ArrayParameter extends BaseParameter {
@@ -300,6 +340,6 @@ public class ParameterFactory {
                 return type.fromObject(argument);
             }
         }
-        throw new IllegalArgumentException("Cannot accept type of argument: " + argument);
+        throw new IllegalArgumentException("Cannot accept type of argument: " + argument.getClass());
     }
 }

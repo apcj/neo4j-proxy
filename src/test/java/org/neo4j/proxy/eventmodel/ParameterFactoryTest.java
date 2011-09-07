@@ -22,6 +22,8 @@ package org.neo4j.proxy.eventmodel;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.proxy.eventmodel.ParameterFactory.fromObject;
@@ -42,6 +44,7 @@ public class ParameterFactoryTest {
         assertCanRoundTripArray(new int[]{});
         assertCanRoundTripArray(new int[]{1, 2, 3});
         assertCanRoundTripArray(new Integer[]{1, 2, 3});
+        assertCanRoundTripArray(new boolean[]{true, false, true});
     }
 
     private void assertCanRoundTrip(Object object) {
@@ -52,6 +55,18 @@ public class ParameterFactoryTest {
     private void assertCanRoundTripArray(int[] array) {
         assertArrayEquals(array, (int[]) fromObject(array).getValue(null));
         assertArrayEquals(array, (int[]) parse(serialize(fromObject(array))).getValue(null));
+    }
+
+    private void assertCanRoundTripArray(boolean[] array) {
+        assertBooleanArrayEquals(array, (boolean[]) fromObject(array).getValue(null));
+        assertBooleanArrayEquals(array, (boolean[]) parse(serialize(fromObject(array))).getValue(null));
+    }
+
+    private void assertBooleanArrayEquals(boolean[] expected, boolean[] actual) {
+        assertEquals(expected.length, actual.length);
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], actual[i]);
+        }
     }
 
     private void assertCanRoundTripArray(Object[] array) {
