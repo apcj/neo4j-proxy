@@ -155,7 +155,7 @@ public class ParameterFactory {
             }
 
             class DirectionParameter extends BaseParameter {
-                private org.neo4j.graphdb.Direction direction;
+                private Direction direction;
 
                 DirectionParameter(ParameterType type, Direction direction) {
                     super(type);
@@ -171,143 +171,32 @@ public class ParameterFactory {
                 }
             }
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new DirectionParameter(this, org.neo4j.graphdb.Direction.valueOf((String) serializedValue));
+                return new DirectionParameter(this, Direction.valueOf((String) serializedValue));
             }
 
             public Parameter fromObject(Object entity) {
                 return new DirectionParameter(this, (org.neo4j.graphdb.Direction) entity);
             }
         });
-        types.add(new BaseParameterType(Integer.class) {
 
-            class IntegerParameter extends BaseParameter {
-                private int value;
-
-                IntegerParameter(ParameterType type, int value) {
-                    super(type);
-                    this.value = value;
-                }
-
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return value;
-                }
-
-                public Object getValueForSerialization() {
-                    return value;
-                }
-            }
-            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new IntegerParameter(this, (Integer) serializedValue);
-            }
-
-            public Parameter fromObject(Object entity) {
-                return new IntegerParameter(this, (Integer) entity);
-            }
-        });
-        types.add(new BaseParameterType(int[].class) {
-            class ArrayParameter extends BaseParameter {
-                private int[] array;
-
-                ArrayParameter(ParameterType type, int[] array) {
-                    super(type);
-                    this.array = array;
-                }
-
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return array;
-                }
-
-                public Object getValueForSerialization() {
-                    return array;
-                }
-            }
-            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new ArrayParameter(this, (int[]) serializedValue);
-            }
-
-            public Parameter fromObject(Object entity) {
-                return new ArrayParameter(this, (int[]) entity);
-            }
-        });
-        types.add(new BaseParameterType(boolean[].class) {
-            class ArrayParameter extends BaseParameter {
-                private boolean[] array;
-
-                ArrayParameter(ParameterType type, boolean[] array) {
-                    super(type);
-                    this.array = array;
-                }
-
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return array;
-                }
-
-                public Object getValueForSerialization() {
-                    return array;
-                }
-            }
-            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new ArrayParameter(this, (boolean[]) serializedValue);
-            }
-
-            public Parameter fromObject(Object entity) {
-                return new ArrayParameter(this, (boolean[]) entity);
-            }
-        });
-        types.add(new BaseParameterType(Integer[].class) {
-
-            class ArrayParameter extends BaseParameter {
-                private Integer[] array;
-
-                ArrayParameter(ParameterType type, Integer[] array) {
-                    super(type);
-                    this.array = array;
-                }
-
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return array;
-                }
-
-                public Object getValueForSerialization() {
-                    return array;
-                }
-            }
-            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new ArrayParameter(this, (Integer[]) serializedValue);
-            }
-
-            public Parameter fromObject(Object entity) {
-                return new ArrayParameter(this, (Integer[]) entity);
-            }
-        });
-        types.add(new BaseParameterType(Boolean[].class) {
-
-            class ArrayParameter extends BaseParameter {
-                private Boolean[] array;
-
-                ArrayParameter(ParameterType type, Boolean[] array) {
-                    super(type);
-                    this.array = array;
-                }
-
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return array;
-                }
-
-                public Object getValueForSerialization() {
-                    return array;
-                }
-            }
-            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new ArrayParameter(this, (Boolean[]) serializedValue);
-            }
-
-            public Parameter fromObject(Object entity) {
-                return new ArrayParameter(this, (Boolean[]) entity);
-            }
-        });
-        types.add(new PrimitiveParameterType(String.class));
+        types.add(new PrimitiveParameterType(Boolean.class));
+        types.add(new PrimitiveParameterType(Integer.class));
         types.add(new PrimitiveParameterType(Long.class));
+        types.add(new PrimitiveParameterType(Float.class));
+        types.add(new PrimitiveParameterType(Double.class));
+        types.add(new PrimitiveParameterType(String.class));
+
+        types.add(new PrimitiveParameterType(boolean[].class));
+        types.add(new PrimitiveParameterType(Boolean[].class));
+        types.add(new PrimitiveParameterType(int[].class));
+        types.add(new PrimitiveParameterType(Integer[].class));
+        types.add(new PrimitiveParameterType(long[].class));
+        types.add(new PrimitiveParameterType(Long[].class));
+        types.add(new PrimitiveParameterType(float[].class));
+        types.add(new PrimitiveParameterType(Float[].class));
+        types.add(new PrimitiveParameterType(double[].class));
+        types.add(new PrimitiveParameterType(Double[].class));
+        types.add(new PrimitiveParameterType(String[].class));
     }
 
     private static class PrimitiveParameterType extends BaseParameterType {

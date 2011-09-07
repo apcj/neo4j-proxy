@@ -39,17 +39,26 @@ public class ParameterFactoryTest {
     @Test
     public void shouldAcceptAllPrimitiveTypes()
     {
+        assertCanRoundTrip(true);
+        assertCanRoundTrip(23);
         assertCanRoundTrip(12l);
+        assertCanRoundTrip(2.3f);
+        assertCanRoundTrip(3.4d);
+        assertCanRoundTrip("I am a String");
     }
 
     @Test
     public void shouldAcceptArrays()
     {
-        assertCanRoundTripArray(new int[]{});
-        assertCanRoundTripArray(new int[]{1, 2, 3});
-        assertCanRoundTripArray(new Integer[]{1, 2, 3});
         assertCanRoundTripArray(new boolean[]{true, false, true});
         assertCanRoundTripArray(new Boolean[]{true, false, true});
+        assertCanRoundTripArray(new int[]{1, 2, 3});
+        assertCanRoundTripArray(new Integer[]{1, 2, 3});
+        assertCanRoundTripArray(new Long[]{1l, 2l, 3l});
+        assertCanRoundTripArray(new Float[]{1.0f, 2.0f, 3.0f});
+        assertCanRoundTripArray(new Double[]{1.0d, 2.0d, 3.0d});
+        assertCanRoundTripArray(new Double[]{1.0d, 2.0d, 3.0d});
+        assertCanRoundTripArray(new String[]{"These", "are", "strings"});
     }
 
     private void assertCanRoundTrip(Object object) {
