@@ -19,6 +19,8 @@
  */
 package org.neo4j.proxy.eventmodel;
 
+import org.neo4j.proxy.eventmodel.parameters.Parameter;
+
 import java.util.Arrays;
 
 public class Event {
@@ -64,5 +66,9 @@ public class Event {
         result = 31 * result + (methodName != null ? methodName.hashCode() : 0);
         result = 31 * result + (parameters != null ? Arrays.hashCode(parameters) : 0);
         return result;
+    }
+
+    public interface Listener {
+        void onEvent(Event event);
     }
 }

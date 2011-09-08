@@ -21,7 +21,7 @@ package org.neo4j.proxy.playback;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.Parameter;
+import org.neo4j.proxy.eventmodel.parameters.Parameter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

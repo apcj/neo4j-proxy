@@ -17,13 +17,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel;
+package org.neo4j.proxy.eventmodel.parameters;
 
-public interface ParameterType {
-    Class getWrappedType();
-    Class getSerializedType();
-    boolean acceptTypeName(String typeString);
-    boolean acceptObject(Object object);
-    Parameter fromSerializedValue(String typeString, Object serializedValue);
-    public Parameter fromObject(Object entity);
+import org.neo4j.proxy.eventmodel.EntityFinder;
+
+public interface Parameter {
+
+    ParameterType getType();
+
+    Object getValueForPlayback(EntityFinder entityFinder);
+
+    Object getValueForSerialization();
 }

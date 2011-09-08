@@ -19,10 +19,7 @@
  */
 package org.neo4j.proxy.eventmodel.parameters;
 
-import org.neo4j.proxy.eventmodel.Parameter;
-import org.neo4j.proxy.eventmodel.ParameterFactory;
-import org.neo4j.proxy.eventmodel.ParameterType;
-import org.neo4j.proxy.playback.PlaybackState;
+import org.neo4j.proxy.eventmodel.EntityFinder;
 
 public class NullParameterType implements ParameterType {
     public Class getWrappedType() {
@@ -39,7 +36,7 @@ public class NullParameterType implements ParameterType {
             return NullParameterType.this;
         }
 
-        public Object getValueForPlayback(PlaybackState playbackState) {
+        public Object getValueForPlayback(EntityFinder entityFinder) {
             return null;
         }
 

@@ -23,8 +23,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.Parameter;
-import org.neo4j.proxy.eventmodel.ParameterFactory;
+import org.neo4j.proxy.eventmodel.parameters.Parameter;
+import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -32,16 +32,12 @@ import java.lang.reflect.Proxy;
 
 public class RecordingGraphDatabase {
 
-    public interface Listener {
-        void onEvent(Event event);
-    }
-
-    public static GraphDatabaseService create(final Listener listener, final GraphDatabaseService delegate) {
-        final Listener filteredListener = new FilterOutUninterestingMethods(listener);
+    public static GraphDatabaseService create(final Event.Listener listener, final GraphDatabaseService delegate) {
+        final Event.Listener filteredListener = new FilterOutUninterestingMethods(listener);
         return createProxy(filteredListener, delegate, GraphDatabaseService.class);
     }
 
-    public static <T> T createProxy(final Listener listener, final T delegate, final Class aClass) {
+    public static <T> T createProxy(final Event.Listener listener, final T delegate, final Class aClass) {
         //noinspection unchecked
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
@@ -65,10 +61,10 @@ public class RecordingGraphDatabase {
         return detachedArguments;
     }
 
-    private static class FilterOutUninterestingMethods implements Listener {
-        private Listener delegate;
+    private static class FilterOutUninterestingMethods implements Event.Listener {
+        private Event.Listener delegate;
 
-        public FilterOutUninterestingMethods(Listener delegate) {
+        public FilterOutUninterestingMethods(Event.Listener delegate) {
             this.delegate = delegate;
         }
 

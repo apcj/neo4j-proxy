@@ -20,11 +20,10 @@
 package org.neo4j.proxy.eventmodel.serialization;
 
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.recording.RecordingGraphDatabase;
 
 import java.io.PrintWriter;
 
-public class JacksonSerializer implements RecordingGraphDatabase.Listener {
+public class JacksonSerializer implements Event.Listener {
 
     private PrintWriter writer;
 

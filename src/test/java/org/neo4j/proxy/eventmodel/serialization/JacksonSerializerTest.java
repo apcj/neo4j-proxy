@@ -19,25 +19,18 @@
  */
 package org.neo4j.proxy.eventmodel.serialization;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
-import org.codehaus.jackson.node.POJONode;
 import org.junit.Test;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.Parameter;
+import org.neo4j.proxy.eventmodel.parameters.Parameter;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.neo4j.proxy.eventmodel.FakeNode.node;
-import static org.neo4j.proxy.eventmodel.ParameterFactory.fromObject;
+import static org.neo4j.proxy.eventmodel.parameters.ParameterFactory.fromObject;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.parseEvent;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeEvent;
 

@@ -96,7 +96,7 @@ public class RecordReplayTest {
         return playbackGraphDatabase;
     }
 
-    private void writeToDatabase(String storeDir, RecordingGraphDatabase.Listener listener) {
+    private void writeToDatabase(String storeDir, Event.Listener listener) {
         clean(storeDir);
 
         GraphDatabaseService recordingGraphDatabase = RecordingGraphDatabase.create(listener, new EmbeddedGraphDatabase(storeDir));
@@ -139,7 +139,7 @@ public class RecordReplayTest {
         working_on
     }
 
-    private static class EventListAccumulator implements RecordingGraphDatabase.Listener {
+    private static class EventListAccumulator implements Event.Listener {
         private final List<Event> events;
 
         public EventListAccumulator(List<Event> events) {

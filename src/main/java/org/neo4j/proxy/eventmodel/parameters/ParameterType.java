@@ -19,28 +19,11 @@
  */
 package org.neo4j.proxy.eventmodel.parameters;
 
-public abstract class BaseParameterType implements ParameterType {
-
-    private Class wrappedType;
-
-    public BaseParameterType(Class wrappedType) {
-        this.wrappedType = wrappedType;
-    }
-
-    public Class getWrappedType() {
-        return wrappedType;
-    }
-
-    public Class getSerializedType() {
-        return wrappedType;
-    }
-
-    public boolean acceptTypeName(String typeString) {
-        return wrappedType.getSimpleName().equals(typeString);
-    }
-
-    public boolean acceptObject(Object object) {
-        return wrappedType.isAssignableFrom(object.getClass());
-    }
-
+public interface ParameterType {
+    Class getWrappedType();
+    Class getSerializedType();
+    boolean acceptTypeName(String typeString);
+    boolean acceptObject(Object object);
+    Parameter fromSerializedValue(String typeString, Object serializedValue);
+    public Parameter fromObject(Object entity);
 }

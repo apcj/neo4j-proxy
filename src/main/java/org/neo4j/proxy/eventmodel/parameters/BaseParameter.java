@@ -19,9 +19,6 @@
  */
 package org.neo4j.proxy.eventmodel.parameters;
 
-import org.neo4j.proxy.eventmodel.Parameter;
-import org.neo4j.proxy.eventmodel.ParameterType;
-
 public abstract class BaseParameter implements Parameter {
 
     private ParameterType type;

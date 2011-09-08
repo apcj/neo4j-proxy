@@ -22,8 +22,9 @@ package org.neo4j.proxy.playback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.proxy.eventmodel.EntityFinder;
 
-public class PlaybackState {
+public class PlaybackState implements EntityFinder {
     private GraphDatabaseService graphDatabase;
     private NodeCache nodeCache = new NodeCache();
     private Transaction currentTransaction = null;
@@ -49,7 +50,7 @@ public class PlaybackState {
         return currentTransaction;
     }
 
-    public NodeCache getNodeCache() {
-        return nodeCache;
+    public Node getNode(long id) {
+        return nodeCache.get(id);
     }
 }

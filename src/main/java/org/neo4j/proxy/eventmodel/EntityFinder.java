@@ -19,13 +19,21 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.neo4j.proxy.playback.PlaybackState;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
-public interface Parameter {
+/**
+ * Created by IntelliJ IDEA.
+ * User: apcj
+ * Date: 08/09/2011
+ * Time: 11:48
+ * To change this template use File | Settings | File Templates.
+ */
+public interface EntityFinder {
+    GraphDatabaseService getGraphDatabase();
 
-    ParameterType getType();
+    Transaction getCurrentTransaction();
 
-    Object getValueForPlayback(PlaybackState playbackState);
-
-    Object getValueForSerialization();
+    Node getNode(long id);
 }

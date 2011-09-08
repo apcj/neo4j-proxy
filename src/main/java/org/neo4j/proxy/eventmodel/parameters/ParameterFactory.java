@@ -17,13 +17,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel;
+package org.neo4j.proxy.eventmodel.parameters;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.proxy.eventmodel.parameters.BaseParameter;
-import org.neo4j.proxy.eventmodel.parameters.BaseParameterType;
-import org.neo4j.proxy.eventmodel.parameters.NullParameterType;
-import org.neo4j.proxy.playback.PlaybackState;
+import org.neo4j.proxy.eventmodel.EntityFinder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +40,8 @@ public class ParameterFactory {
                     super(type);
                 }
 
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return playbackState.getGraphDatabase();
+                public Object getValueForPlayback(EntityFinder entityFinder) {
+                    return entityFinder.getGraphDatabase();
                 }
 
                 public Object getValueForSerialization() {
@@ -70,8 +67,8 @@ public class ParameterFactory {
                     super(type);
                 }
 
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return playbackState.getCurrentTransaction();
+                public Object getValueForPlayback(EntityFinder entityFinder) {
+                    return entityFinder.getCurrentTransaction();
                 }
 
                 public Object getValueForSerialization() {
@@ -100,8 +97,8 @@ public class ParameterFactory {
                     this.id = id;
                 }
 
-                public Object getValueForPlayback(PlaybackState playbackState) {
-                    return playbackState.getNodeCache().get(id);
+                public Object getValueForPlayback(EntityFinder entityFinder) {
+                    return entityFinder.getNode(id);
                 }
 
                 public Object getValueForSerialization() {
@@ -130,7 +127,7 @@ public class ParameterFactory {
                     this.name = name;
                 }
 
-                public Object getValueForPlayback(PlaybackState playbackState) {
+                public Object getValueForPlayback(EntityFinder entityFinder) {
                     return this;
                 }
 
@@ -164,7 +161,7 @@ public class ParameterFactory {
                     this.direction = direction;
                 }
 
-                public Object getValueForPlayback(PlaybackState playbackState) {
+                public Object getValueForPlayback(EntityFinder entityFinder) {
                     return direction;
                 }
 
@@ -221,7 +218,7 @@ public class ParameterFactory {
                 return PrimitiveParameterType.this;
             }
 
-            public Object getValueForPlayback(PlaybackState playbackState) {
+            public Object getValueForPlayback(EntityFinder entityFinder) {
                 return value;
             }
 

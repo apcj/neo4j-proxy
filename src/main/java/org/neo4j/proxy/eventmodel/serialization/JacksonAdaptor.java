@@ -25,13 +25,12 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.Parameter;
-import org.neo4j.proxy.eventmodel.ParameterFactory;
-import org.neo4j.proxy.eventmodel.ParameterType;
+import org.neo4j.proxy.eventmodel.parameters.Parameter;
+import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
+import org.neo4j.proxy.eventmodel.parameters.ParameterType;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
