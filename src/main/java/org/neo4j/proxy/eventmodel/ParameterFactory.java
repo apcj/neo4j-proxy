@@ -22,6 +22,7 @@ package org.neo4j.proxy.eventmodel;
 import org.neo4j.graphdb.*;
 import org.neo4j.proxy.eventmodel.parameters.BaseParameter;
 import org.neo4j.proxy.eventmodel.parameters.BaseParameterType;
+import org.neo4j.proxy.eventmodel.parameters.NullParameterType;
 import org.neo4j.proxy.playback.PlaybackState;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class ParameterFactory {
 
     public static final List<ParameterType> types = new ArrayList<ParameterType>();
     static {
+        types.add(new NullParameterType());
         types.add(new BaseParameterType(GraphDatabaseService.class) {
             public Class getSerializedType() {
                 return String.class;
@@ -260,4 +262,5 @@ public class ParameterFactory {
         }
         throw new IllegalArgumentException("Cannot accept type of argument: " + argument.getClass());
     }
+
 }

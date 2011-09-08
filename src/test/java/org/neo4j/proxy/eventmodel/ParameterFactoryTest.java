@@ -40,6 +40,12 @@ public class ParameterFactoryTest {
     }
 
     @Test
+    public void shouldAcceptNull()
+    {
+        assertCanRoundTrip(null);
+    }
+
+    @Test
     public void shouldAcceptAllPrimitiveTypes()
     {
         assertCanRoundTrip(true);
