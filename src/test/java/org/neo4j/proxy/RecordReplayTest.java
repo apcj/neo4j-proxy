@@ -75,17 +75,6 @@ public class RecordReplayTest {
         serializer.flush();
     }
 
-    private void makeAssertionsAboutTheData(String playbackStoreDir) {
-        EmbeddedReadOnlyGraphDatabase readDatabase = new EmbeddedReadOnlyGraphDatabase(playbackStoreDir);
-        Iterable<Relationship> relationships = readDatabase.getNodeById(1).getRelationships(RelationshipTypes.working_on, Direction.INCOMING);
-        int relationshipCount = 0;
-        for (Relationship relationship : relationships) {
-            relationshipCount++;
-        }
-        assertEquals(3, relationshipCount);
-        readDatabase.shutdown();
-    }
-
     private EmbeddedGraphDatabase playbackToDifferentDatabase(Iterable<Event> events, String playbackStoreDir) {
         clean(playbackStoreDir);
 
@@ -126,13 +115,33 @@ public class RecordReplayTest {
             Node mattias = graphDatabase.createNode();
             mattias.setProperty("name", "Mattias");
 
-            alistair.createRelationshipTo(storeRefactoring, RelationshipTypes.working_on);
-            chris.createRelationshipTo(storeRefactoring, RelationshipTypes.working_on);
-            mattias.createRelationshipTo(storeRefactoring, RelationshipTypes.working_on);
+            Relationship relationship1 = alistair.createRelationshipTo(storeRefactoring, RelationshipTypes.working_on);
+            relationship1.setProperty("effort", 1d);
+            Relationship relationship2 = chris.createRelationshipTo(storeRefactoring, RelationshipTypes.working_on);
+            relationship2.setProperty("effort", 1d);
+            Relationship relationship3 = mattias.createRelationshipTo(storeRefactoring, RelationshipTypes.working_on);
+            relationship3.setProperty("effort", 0.5d);
             tx.success();
         } finally {
             tx.finish();
         }
+    }
+
+    private void makeAssertionsAboutTheData(String playbackStoreDir) {
+        EmbeddedReadOnlyGraphDatabase readDatabase = new EmbeddedReadOnlyGraphDatabase(playbackStoreDir);
+        Iterable<Relationship> relationships = readDatabase.getNodeById(1).getRelationships(RelationshipTypes.working_on, Direction.INCOMING);
+        int relationshipCount = 0;
+        for (Relationship relationship : relationships) {
+            relationshipCount++;
+            String name = (String) relationship.getStartNode().getProperty("name");
+            if (name.equals("Alistair") || name.equals("Chris")) {
+                assertEquals(1.0d, (Double) relationship.getProperty("effort"), 0.01d);
+            } else {
+                assertEquals(0.5d, (Double) relationship.getProperty("effort"), 0.01d);
+            }
+        }
+        assertEquals(3, relationshipCount);
+        readDatabase.shutdown();
     }
 
     public enum RelationshipTypes implements RelationshipType {

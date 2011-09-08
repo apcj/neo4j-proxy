@@ -21,6 +21,7 @@ package org.neo4j.proxy.recording;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.Event;
 import org.neo4j.proxy.eventmodel.parameters.Parameter;
@@ -47,7 +48,7 @@ public class RecordingGraphDatabase {
                     e.printStackTrace();
                 }
                 Object result = method.invoke(delegate, arguments);
-                if (result instanceof Node || result instanceof Transaction) {
+                if (result instanceof Node || result instanceof Relationship || result instanceof Transaction) {
                     return createProxy(listener, result, method.getReturnType());
                 }
                 return result;

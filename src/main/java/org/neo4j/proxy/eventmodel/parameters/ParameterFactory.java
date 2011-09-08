@@ -113,6 +113,36 @@ public class ParameterFactory {
                 return new NodeParameter(this, ((Node) entity).getId());
             }
         });
+        types.add(new BaseParameterType(Relationship.class) {
+
+            public Class getSerializedType() {
+                return long.class;
+            }
+
+            class RelationshipParameter extends BaseParameter {
+                private long id;
+
+                public RelationshipParameter(ParameterType type, long id) {
+                    super(type);
+                    this.id = id;
+                }
+
+                public Object getValueForPlayback(EntityFinder entityFinder) {
+                    return entityFinder.getRelationship(id);
+                }
+
+                public Object getValueForSerialization() {
+                    return id;
+                }
+            }
+            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+                return new RelationshipParameter(this, (Long) serializedValue);
+            }
+
+            public Parameter fromObject(Object entity) {
+                return new RelationshipParameter(this, ((Relationship) entity).getId());
+            }
+        });
         types.add(new BaseParameterType(RelationshipType.class) {
 
             public Class getSerializedType() {

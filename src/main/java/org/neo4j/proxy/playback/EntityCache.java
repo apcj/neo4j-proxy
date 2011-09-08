@@ -20,29 +20,36 @@
 package org.neo4j.proxy.playback;
 
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.w3c.dom.Entity;
 
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NodeCache {
+public abstract class EntityCache<T> {
 
-    private static Pattern pattern  = Pattern.compile("\\[([0-9]+)\\]");
-    private Map<Long, Node> cache = new HashMap<Long, Node>();
+    protected Map<Long, T> cache = new HashMap<Long, T>();
 
-    public Node get(long id) {
+    public T get(long id) {
         return cache.get(id);
     }
 
-    public static long nodeId(String eventTarget) {
-        Matcher matcher = pattern.matcher(eventTarget);
-        matcher.find();
-        String group = matcher.group(1);
-        return Long.parseLong(group);
+    public abstract void put(T node);
+
+    public static class NodeCache extends EntityCache<Node> {
+
+        public void put(Node node) {
+            cache.put(node.getId(), node);
+        }
     }
 
-    public void put(Node node) {
-        cache.put(node.getId(), node);
+    public static class RelationshipCache extends EntityCache<Relationship> {
+
+        public void put(Relationship node) {
+            cache.put(node.getId(), node);
+        }
     }
 }

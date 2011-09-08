@@ -21,6 +21,7 @@ package org.neo4j.proxy.eventmodel;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 /**
@@ -36,4 +37,6 @@ public interface EntityFinder {
     Transaction getCurrentTransaction();
 
     Node getNode(long id);
+
+    Relationship getRelationship(long id);
 }
