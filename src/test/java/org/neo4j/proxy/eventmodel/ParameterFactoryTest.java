@@ -21,6 +21,7 @@ package org.neo4j.proxy.eventmodel;
 
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Traverser;
 
 import java.util.Arrays;
 
@@ -34,9 +35,10 @@ import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeP
 public class ParameterFactoryTest {
 
     @Test
-    public void shouldAcceptDirection()
+    public void shouldAcceptApiEnums()
     {
         assertCanRoundTrip(Direction.OUTGOING);
+        assertCanRoundTrip(Traverser.Order.BREADTH_FIRST);
     }
 
     @Test

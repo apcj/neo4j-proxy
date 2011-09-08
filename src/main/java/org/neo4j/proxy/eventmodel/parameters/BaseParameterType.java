@@ -21,7 +21,7 @@ package org.neo4j.proxy.eventmodel.parameters;
 
 public abstract class BaseParameterType implements ParameterType {
 
-    private Class wrappedType;
+    protected Class wrappedType;
 
     public BaseParameterType(Class wrappedType) {
         this.wrappedType = wrappedType;
