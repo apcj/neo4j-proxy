@@ -31,6 +31,7 @@ import org.neo4j.proxy.eventmodel.ParameterType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,9 +73,26 @@ public class JacksonAdaptor {
 
     public static JsonNode serializeParameter(Parameter argument) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
+
         node.put("type", argument.getType().getWrappedType().getSimpleName());
-        node.put("value", mapper.<JsonNode>valueToTree(argument.getValueForSerialization()));
+
+        Object value = argument.getValueForSerialization();
+        value = workAroundProblemWithSerializationOfPrimitiveByteArrays(value);
+        node.put("value", mapper.<JsonNode>valueToTree(value));
+
         return node;
+    }
+
+    private static Object workAroundProblemWithSerializationOfPrimitiveByteArrays(Object valueForSerialization) {
+        if (valueForSerialization instanceof byte[]) {
+            byte[] originalValue = (byte[]) valueForSerialization;
+            Byte[] retypedValue = new Byte[originalValue.length];
+            for (int i = 0; i < originalValue.length; i++) {
+                retypedValue[i] = originalValue[i];
+            }
+            valueForSerialization = retypedValue;
+        }
+        return valueForSerialization;
     }
 
     public static Parameter parseParameter(JsonNode jsonNode) {

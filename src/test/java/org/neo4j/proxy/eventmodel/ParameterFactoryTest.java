@@ -22,8 +22,11 @@ package org.neo4j.proxy.eventmodel;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.neo4j.proxy.eventmodel.ParameterFactory.fromObject;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.parseParameter;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeParameter;
@@ -53,6 +56,7 @@ public class ParameterFactoryTest {
     {
         assertCanRoundTripArray(new boolean[]{true, false, true});
         assertCanRoundTripArray(new Boolean[]{true, false, true});
+        assertCanRoundTripArray(new byte[]{Byte.MAX_VALUE, Byte.MIN_VALUE, Byte.MAX_VALUE});
         assertCanRoundTripArray(new Byte[]{Byte.MAX_VALUE, Byte.MIN_VALUE, Byte.MAX_VALUE});
         assertCanRoundTripArray(new int[]{1, 2, 3});
         assertCanRoundTripArray(new Integer[]{1, 2, 3});
@@ -68,21 +72,19 @@ public class ParameterFactoryTest {
         assertEquals(object, parseParameter(serializeParameter(fromObject(object))).getValueForPlayback(null));
     }
 
+    private void assertCanRoundTripArray(boolean[] array) {
+        assertTrue(Arrays.equals(array, (boolean[]) fromObject(array).getValueForPlayback(null)));
+        assertTrue(Arrays.equals(array, (boolean[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null)));
+    }
+
+    private void assertCanRoundTripArray(byte[] array) {
+        assertArrayEquals(array, (byte[]) fromObject(array).getValueForPlayback(null));
+        assertArrayEquals(array, (byte[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
+    }
+
     private void assertCanRoundTripArray(int[] array) {
         assertArrayEquals(array, (int[]) fromObject(array).getValueForPlayback(null));
         assertArrayEquals(array, (int[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
-    }
-
-    private void assertCanRoundTripArray(boolean[] array) {
-        assertBooleanArrayEquals(array, (boolean[]) fromObject(array).getValueForPlayback(null));
-        assertBooleanArrayEquals(array, (boolean[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
-    }
-
-    private void assertBooleanArrayEquals(boolean[] expected, boolean[] actual) {
-        assertEquals(expected.length, actual.length);
-        for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i]);
-        }
     }
 
     private void assertCanRoundTripArray(Object[] array) {

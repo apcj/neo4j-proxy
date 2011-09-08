@@ -73,26 +73,4 @@ public class JacksonSerializerTest {
         verify(printWriter).flush();
     }
 
-    @Test
-    public void shouldDoStuffWithString() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        StringWriter stringWriter = new StringWriter();
-        objectMapper.writeValue(stringWriter, 123);
-        objectMapper.writeValue(stringWriter, new int[] {1, 2, 3});
-        objectMapper.writeValue(stringWriter, "Hello\nThere");
-        System.out.println("stringWriter = " + stringWriter);
-    }
-
-    @Test
-    public void shouldDoStuffWithPojo() throws IOException {
-
-        ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
-        objectNode.put("hello", new ObjectMapper().valueToTree(new int[]{1, 2, 3}));
-        objectNode.put("goodbye", new ObjectMapper().valueToTree("Foo"));
-        System.out.println("objectNode = " + objectNode);
-
-        JsonNode jsonNode = new ObjectMapper().valueToTree(new int[]{1, 2, 3});
-        System.out.println("jsonNode = " + jsonNode.getClass());
-    }
-
 }
