@@ -180,6 +180,7 @@ public class ParameterFactory {
         });
 
         types.add(new PrimitiveParameterType(Boolean.class));
+        types.add(new PrimitiveParameterType(Byte.class));
         types.add(new PrimitiveParameterType(Integer.class));
         types.add(new PrimitiveParameterType(Long.class));
         types.add(new PrimitiveParameterType(Float.class));
@@ -188,6 +189,8 @@ public class ParameterFactory {
 
         types.add(new PrimitiveParameterType(boolean[].class));
         types.add(new PrimitiveParameterType(Boolean[].class));
+        types.add(new PrimitiveParameterType(byte[].class));
+        types.add(new PrimitiveParameterType(Byte[].class));
         types.add(new PrimitiveParameterType(int[].class));
         types.add(new PrimitiveParameterType(Integer[].class));
         types.add(new PrimitiveParameterType(long[].class));

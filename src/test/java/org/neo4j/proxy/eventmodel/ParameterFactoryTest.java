@@ -40,6 +40,7 @@ public class ParameterFactoryTest {
     public void shouldAcceptAllPrimitiveTypes()
     {
         assertCanRoundTrip(true);
+        assertCanRoundTrip(Byte.MAX_VALUE);
         assertCanRoundTrip(23);
         assertCanRoundTrip(12l);
         assertCanRoundTrip(2.3f);
@@ -52,6 +53,7 @@ public class ParameterFactoryTest {
     {
         assertCanRoundTripArray(new boolean[]{true, false, true});
         assertCanRoundTripArray(new Boolean[]{true, false, true});
+        assertCanRoundTripArray(new Byte[]{Byte.MAX_VALUE, Byte.MIN_VALUE, Byte.MAX_VALUE});
         assertCanRoundTripArray(new int[]{1, 2, 3});
         assertCanRoundTripArray(new Integer[]{1, 2, 3});
         assertCanRoundTripArray(new Long[]{1l, 2l, 3l});
