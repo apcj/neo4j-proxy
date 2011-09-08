@@ -41,8 +41,11 @@ public class RecordingGraphDatabase {
         //noinspection unchecked
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
-                System.out.println("method.getName() = " + method.getName());
-                listener.onEvent(new Event(ParameterFactory.fromObject(delegate), method.getName(), convert(arguments)));
+                try {
+                    listener.onEvent(new Event(ParameterFactory.fromObject(delegate), method.getName(), convert(arguments)));
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
                 Object result = method.invoke(delegate, arguments);
                 if (result instanceof Node || result instanceof Transaction) {
                     return createProxy(listener, result, method.getReturnType());
