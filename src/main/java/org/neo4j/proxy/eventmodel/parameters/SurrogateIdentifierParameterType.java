@@ -29,16 +29,6 @@ class SurrogateIdentifierParameterType extends BaseParameterType {
         super(wrappedType);
     }
 
-    @Override
-    public boolean acceptObject(Object object) {
-        boolean accepted = super.acceptObject(object);
-        if (accepted) {
-            System.out.println("object = " + object);
-            System.out.println("wrappedType = " + wrappedType);
-        }
-        return accepted;
-    }
-
     class LongIdentifiedParameter implements Parameter {
         private int id;
 
