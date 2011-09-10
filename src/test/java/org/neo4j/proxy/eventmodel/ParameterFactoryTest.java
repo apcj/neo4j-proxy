@@ -21,15 +21,16 @@ package org.neo4j.proxy.eventmodel;
 
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Traverser;
 import org.neo4j.proxy.eventmodel.parameters.Parameter;
 import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.parseParameter;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeParameter;
 
@@ -38,16 +39,16 @@ public class ParameterFactoryTest {
     ParameterFactory factory = new ParameterFactory();
 
     @Test
+    public void shouldAcceptNull()
+    {
+        assertCanRoundTrip(null);
+    }
+
+    @Test
     public void shouldAcceptApiEnums()
     {
         assertCanRoundTrip(Direction.OUTGOING);
         assertCanRoundTrip(Traverser.Order.BREADTH_FIRST);
-    }
-
-    @Test
-    public void shouldAcceptNull()
-    {
-        assertCanRoundTrip(null);
     }
 
     @Test
@@ -78,6 +79,40 @@ public class ParameterFactoryTest {
         assertCanRoundTripArray(new String[]{"These", "are", "strings"});
     }
 
+    @Test
+    public void shouldKeepTrackOfIterablesAndIteratorsViaSurrogateIdentifiers()
+    {
+        Parameter iterableParameter = factory.fromObjectWithSpecificType(new BothIterableAndIterator(), Iterable.class);
+        Parameter iteratorParameter = factory.fromObjectWithSpecificType(new BothIterableAndIterator().iterator(), Iterator.class);
+        assertEquals("Iterable", iterableParameter.getType().getWrappedType().getSimpleName());
+        assertEquals(0, iterableParameter.getValueForSerialization());
+        assertEquals("Iterator", iteratorParameter.getType().getWrappedType().getSimpleName());
+        assertEquals(0, iteratorParameter.getValueForSerialization());
+    }
+
+    @Test
+    public void shouldAcceptRelationshipType()
+    {
+        assertCanRoundTripRelationshipType(ExampleRelationshipType.A);
+        assertCanRoundTripRelationshipTypeArray(new RelationshipType[]{ExampleRelationshipType.A, ExampleRelationshipType.B});
+    }
+
+    private void assertCanRoundTripRelationshipTypeArray(RelationshipType[] relationshipTypes) {
+        RelationshipType[] valueForPlayback = (RelationshipType[]) factory.fromObject(relationshipTypes).getValueForPlayback(null);
+        for (int i = 0; i < relationshipTypes.length; i++) {
+            assertEquals(relationshipTypes[i].name(), valueForPlayback[i].name());
+        }
+    }
+
+    private void assertCanRoundTripRelationshipType(ExampleRelationshipType relationshipType) {
+        assertEquals(relationshipType.name(), ((RelationshipType) factory.fromObject(relationshipType).getValueForPlayback(null)).name());
+        assertEquals(relationshipType.name(), ((RelationshipType) parseParameter(serializeParameter(factory.fromObject(relationshipType))).getValueForPlayback(null)).name());
+    }
+
+    enum ExampleRelationshipType implements RelationshipType {
+        A, B
+    }
+
     static class BothIterableAndIterator implements Iterable, Iterator {
 
         public Iterator iterator() {
@@ -94,17 +129,6 @@ public class ParameterFactoryTest {
 
         public void remove() {
         }
-    }
-
-    @Test
-    public void shouldKeepTrackOfIterablesAndIteratorsViaSurrogateIdentifiers()
-    {
-        Parameter iterableParameter = factory.fromObjectWithSpecificType(new BothIterableAndIterator(), Iterable.class);
-        Parameter iteratorParameter = factory.fromObjectWithSpecificType(new BothIterableAndIterator().iterator(), Iterator.class);
-        assertEquals("Iterable", iterableParameter.getType().getWrappedType().getSimpleName());
-        assertEquals(0, iterableParameter.getValueForSerialization());
-        assertEquals("Iterator", iteratorParameter.getType().getWrappedType().getSimpleName());
-        assertEquals(0, iteratorParameter.getValueForSerialization());
     }
 
     private void assertCanRoundTrip(Object object) {

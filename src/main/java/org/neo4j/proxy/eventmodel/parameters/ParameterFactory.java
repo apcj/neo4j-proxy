@@ -145,40 +145,8 @@ public class ParameterFactory {
                 return new RelationshipParameter(this, ((Relationship) entity).getId());
             }
         });
-        types.add(new BaseParameterType(RelationshipType.class) {
-
-            public Class getSerializedType() {
-                return String.class;
-            }
-
-            class RelationshipTypeParameter extends BaseParameter implements RelationshipType {
-                private String name;
-
-                RelationshipTypeParameter(ParameterType type, String name) {
-                    super(type);
-                    this.name = name;
-                }
-
-                public Object getValueForPlayback(EntityFinder entityFinder) {
-                    return this;
-                }
-
-                public String name() {
-                    return name;
-                }
-
-                public Object getValueForSerialization() {
-                    return name;
-                }
-            }
-            public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new RelationshipTypeParameter(this, (String) serializedValue);
-            }
-
-            public Parameter fromObject(Object entity) {
-                return new RelationshipTypeParameter(this, ((org.neo4j.graphdb.RelationshipType) entity).name());
-            }
-        });
+        types.add(new RelationshipTypeParameterType());
+        types.add(new RelationshipTypeArrayParameterType());
         types.add(new SurrogateIdentifierParameterType(Iterator.class));
         types.add(new SurrogateIdentifierParameterType(Iterable.class));
 
@@ -224,5 +192,104 @@ public class ParameterFactory {
             }
         }
         throw new IllegalArgumentException("Cannot accept type of argument: " + interfaceType);
+    }
+
+    private class RelationshipTypeParameterType extends BaseParameterType {
+
+        public RelationshipTypeParameterType() {
+            super(RelationshipType.class);
+        }
+
+        public Class getSerializedType() {
+            return String.class;
+        }
+
+        class RelationshipTypeParameter implements Parameter {
+            private String name;
+
+            RelationshipTypeParameter(String name) {
+                this.name = name;
+            }
+
+            public ParameterType getType() {
+                return RelationshipTypeParameterType.this;
+            }
+
+            public Object getValueForPlayback(EntityFinder entityFinder) {
+                return new StandInRelationshipType(name);
+            }
+
+            public Object getValueForSerialization() {
+                return name;
+            }
+        }
+
+        public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+            return new RelationshipTypeParameter((String) serializedValue);
+        }
+
+        public Parameter fromObject(Object entity) {
+            return new RelationshipTypeParameter(((RelationshipType) entity).name());
+        }
+    }
+
+    private class RelationshipTypeArrayParameterType extends BaseParameterType {
+
+        public RelationshipTypeArrayParameterType() {
+            super(RelationshipType[].class);
+        }
+
+        public Class getSerializedType() {
+            return String.class;
+        }
+
+        class RelationshipTypeArrayParameter implements Parameter {
+            private String[] names;
+
+            RelationshipTypeArrayParameter(String[] names) {
+                this.names = names;
+            }
+
+            public ParameterType getType() {
+                return RelationshipTypeArrayParameterType.this;
+            }
+
+            public Object getValueForPlayback(EntityFinder entityFinder) {
+                RelationshipType[] relationshipTypes = new RelationshipType[names.length];
+                for (int i = 0; i < names.length; i++) {
+                    relationshipTypes[i] = new StandInRelationshipType(names[i]);
+                }
+                return relationshipTypes;
+            }
+
+            public Object getValueForSerialization() {
+                return names;
+            }
+        }
+
+        public Parameter fromSerializedValue(String typeString, Object serializedValue) {
+            return new RelationshipTypeArrayParameter((String[]) serializedValue);
+        }
+
+        public Parameter fromObject(Object entity) {
+            RelationshipType[] relationshipTypes = (RelationshipType[]) entity;
+            String[] names = new String[relationshipTypes.length];
+            for (int i = 0; i < relationshipTypes.length; i++) {
+                names[i] = relationshipTypes[i].name();
+            }
+            return new RelationshipTypeArrayParameter(names);
+        }
+    }
+
+    private class StandInRelationshipType implements RelationshipType {
+        private String name;
+
+        public StandInRelationshipType(String name) {
+            this.name = name;
+        }
+
+        public String name() {
+            return name;
+        }
     }
 }
