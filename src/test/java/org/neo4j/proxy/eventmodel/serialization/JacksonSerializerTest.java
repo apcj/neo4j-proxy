@@ -22,6 +22,7 @@ package org.neo4j.proxy.eventmodel.serialization;
 import org.junit.Test;
 import org.neo4j.proxy.eventmodel.Event;
 import org.neo4j.proxy.eventmodel.parameters.Parameter;
+import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
 
 import java.io.PrintWriter;
 
@@ -30,16 +31,17 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.neo4j.proxy.eventmodel.FakeNode.node;
-import static org.neo4j.proxy.eventmodel.parameters.ParameterFactory.fromObject;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.parseEvent;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeEvent;
 
 public class JacksonSerializerTest {
 
+    ParameterFactory factory = new ParameterFactory();
+
     @Test
     public void canRoundTripViaJson()
     {
-        Event event = new Event(fromObject(node(20)), "method", new Parameter[] {fromObject("name"), fromObject("Alistair")});
+        Event event = new Event(factory.fromObject(node(20)), "method", new Parameter[] {factory.fromObject("name"), factory.fromObject("Alistair")});
 
         assertEquals(event, parseEvent(serializeEvent(event)));
 
@@ -50,7 +52,7 @@ public class JacksonSerializerTest {
     public void shouldPrintEachEvent() throws Exception {
         PrintWriter printWriter = mock(PrintWriter.class);
 
-        Event event = new Event(fromObject(node(20)), "method", new Parameter[] {fromObject("name"), fromObject("Alistair")});
+        Event event = new Event(factory.fromObject(node(20)), "method", new Parameter[] {factory.fromObject("name"), factory.fromObject("Alistair")});
         new JacksonSerializer(printWriter).onEvent(event);
 
         verify(printWriter).println(anyString());

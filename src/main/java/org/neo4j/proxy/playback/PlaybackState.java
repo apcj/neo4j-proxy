@@ -25,14 +25,19 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 
+import java.util.*;
+
 public class PlaybackState implements EntityFinder {
     private GraphDatabaseService graphDatabase;
     private EntityCache.NodeCache nodeCache = new EntityCache.NodeCache();
     private EntityCache.RelationshipCache relationshipCache = new EntityCache.RelationshipCache();
     private Transaction currentTransaction = null;
+    private Map<Class, List<Object>> entitiesWithSurrogateIdentifiers = new HashMap<Class, List<Object>>();
 
     public PlaybackState(GraphDatabaseService graphDatabase) {
         this.graphDatabase = graphDatabase;
+        entitiesWithSurrogateIdentifiers.put(Iterable.class, new ArrayList<Object>());
+        entitiesWithSurrogateIdentifiers.put(Iterator.class, new ArrayList<Object>());
     }
 
     public void capture(Object result) {
@@ -44,6 +49,12 @@ public class PlaybackState implements EntityFinder {
         }
         if (result instanceof Transaction) {
             currentTransaction = (Transaction) result;
+        }
+        if (result instanceof Iterable) {
+            entitiesWithSurrogateIdentifiers.get(Iterable.class).add(result);
+        }
+        if (result instanceof Iterator) {
+            entitiesWithSurrogateIdentifiers.get(Iterator.class).add(result);
         }
     }
 
@@ -61,5 +72,9 @@ public class PlaybackState implements EntityFinder {
 
     public Relationship getRelationship(long id) {
         return relationshipCache.get(id);
+    }
+
+    public Object findBySurrogateIdentifier(Class wrappedType, int surrogateIdentifier) {
+        return entitiesWithSurrogateIdentifiers.get(wrappedType).get(surrogateIdentifier);
     }
 }

@@ -23,12 +23,14 @@ import org.neo4j.graphdb.*;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ParameterFactory {
 
-    public static final List<ParameterType> types = new ArrayList<ParameterType>();
-    static {
+    public final List<ParameterType> types = new ArrayList<ParameterType>();
+
+    public ParameterFactory() {
         types.add(new NullParameterType());
         types.add(new BaseParameterType(GraphDatabaseService.class) {
             public Class getSerializedType() {
@@ -177,6 +179,9 @@ public class ParameterFactory {
                 return new RelationshipTypeParameter(this, ((org.neo4j.graphdb.RelationshipType) entity).name());
             }
         });
+        types.add(new SurrogateIdentifierParameterType(Iterator.class));
+        types.add(new SurrogateIdentifierParameterType(Iterable.class));
+
         types.add(new EnumParameterType(Direction.class));
         types.add(new EnumParameterType(Traverser.Order.class));
 
@@ -203,7 +208,7 @@ public class ParameterFactory {
         types.add(new PrimitiveParameterType(String[].class));
     }
 
-    public static Parameter fromObject(Object argument) {
+    public Parameter fromObject(Object argument) {
         for (ParameterType type : types) {
             if (type.acceptObject(argument)) {
                 return type.fromObject(argument);
@@ -212,4 +217,12 @@ public class ParameterFactory {
         throw new IllegalArgumentException("Cannot accept type of argument: " + argument.getClass());
     }
 
+    public Parameter fromObjectWithSpecificType(Object argument, Class interfaceType) {
+        for (ParameterType type : types) {
+            if (type.getWrappedType() == interfaceType) {
+                return type.fromObject(argument);
+            }
+        }
+        throw new IllegalArgumentException("Cannot accept type of argument: " + interfaceType);
+    }
 }

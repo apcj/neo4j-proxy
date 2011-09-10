@@ -35,7 +35,7 @@ public class FakeNode implements Node {
 
     @Override
     public long getId() {
-        return 0;
+        return id;
     }
 
     @Override

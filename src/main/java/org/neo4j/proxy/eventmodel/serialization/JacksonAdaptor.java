@@ -94,9 +94,11 @@ public class JacksonAdaptor {
         return valueForSerialization;
     }
 
+    private static final ParameterFactory parameterFactory = new ParameterFactory();
+
     public static Parameter parseParameter(JsonNode jsonNode) {
         String typeName = jsonNode.get("type").getTextValue();
-        for (ParameterType type : ParameterFactory.types) {
+        for (ParameterType type : parameterFactory.types) {
             if (type.acceptTypeName(typeName)) {
                 try {
                     Object serializedValue = mapper.<Object>treeToValue(jsonNode.get("value"), type.getSerializedType());

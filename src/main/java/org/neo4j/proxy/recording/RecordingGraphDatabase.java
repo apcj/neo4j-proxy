@@ -30,37 +30,51 @@ import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Iterator;
 
 public class RecordingGraphDatabase {
 
     public static GraphDatabaseService create(final Event.Listener listener, final GraphDatabaseService delegate) {
         final Event.Listener filteredListener = new FilterOutUninterestingMethods(listener);
-        return createProxy(filteredListener, delegate, GraphDatabaseService.class);
+        return createProxy(filteredListener, delegate, GraphDatabaseService.class, new ParameterFactory());
     }
 
-    public static <T> T createProxy(final Event.Listener listener, final T delegate, final Class aClass) {
+    public static <T> T createProxy(final Event.Listener listener, final T delegate, final Class aClass, final ParameterFactory parameterFactory) {
+        final Parameter targetParameter = parameterFactory.fromObjectWithSpecificType(delegate, aClass);
+
         //noinspection unchecked
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
+
                 try {
-                    listener.onEvent(new Event(ParameterFactory.fromObject(delegate), method.getName(), convert(arguments)));
+                    listener.onEvent(new Event(targetParameter, method.getName(), convert(arguments, parameterFactory)));
                 } catch (RuntimeException e) {
                     e.printStackTrace();
                 }
-                Object result = method.invoke(delegate, arguments);
-                if (result instanceof Node || result instanceof Relationship || result instanceof Transaction) {
-                    return createProxy(listener, result, method.getReturnType());
+                final Object result = method.invoke(delegate, arguments);
+                if (result instanceof Node || result instanceof Relationship || result instanceof Transaction
+                        || result instanceof Iterable || result instanceof Iterator) {
+                    return createProxy(listener, result, chooseProxyInterface(method, result), parameterFactory);
                 }
                 return result;
             }
         });
     }
 
-    private static Parameter[] convert(Object[] arguments) {
+    private static Class<?> chooseProxyInterface(Method method, Object result) {
+
+        if (method.getReturnType().isInterface()) return method.getReturnType();
+        if (result instanceof Node) return Node.class;
+        if (result instanceof Relationship) return Relationship.class;
+
+        throw new IllegalArgumentException("No suitable interface for " + result.getClass());
+    }
+
+    private static Parameter[] convert(Object[] arguments, ParameterFactory parameterFactory) {
         if (arguments == null) return new Parameter[0];
         Parameter[] detachedArguments = new Parameter[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
-            detachedArguments[i] = ParameterFactory.fromObject(arguments[i]);
+            detachedArguments[i] = parameterFactory.fromObject(arguments[i]);
         }
         return detachedArguments;
     }

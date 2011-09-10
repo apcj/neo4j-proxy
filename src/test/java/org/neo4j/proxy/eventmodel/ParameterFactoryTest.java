@@ -22,17 +22,20 @@ package org.neo4j.proxy.eventmodel;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Traverser;
+import org.neo4j.proxy.eventmodel.parameters.Parameter;
+import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.neo4j.proxy.eventmodel.parameters.ParameterFactory.fromObject;
+import static org.junit.Assert.*;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.parseParameter;
 import static org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor.serializeParameter;
 
 public class ParameterFactoryTest {
+
+    ParameterFactory factory = new ParameterFactory();
 
     @Test
     public void shouldAcceptApiEnums()
@@ -75,28 +78,57 @@ public class ParameterFactoryTest {
         assertCanRoundTripArray(new String[]{"These", "are", "strings"});
     }
 
+    static class BothIterableAndIterator implements Iterable, Iterator {
+
+        public Iterator iterator() {
+            return null;
+        }
+
+        public boolean hasNext() {
+            return false;
+        }
+
+        public Object next() {
+            return null;
+        }
+
+        public void remove() {
+        }
+    }
+
+    @Test
+    public void shouldKeepTrackOfIterablesAndIteratorsViaSurrogateIdentifiers()
+    {
+        Parameter iterableParameter = factory.fromObjectWithSpecificType(new BothIterableAndIterator(), Iterable.class);
+        Parameter iteratorParameter = factory.fromObjectWithSpecificType(new BothIterableAndIterator().iterator(), Iterator.class);
+        assertEquals("Iterable", iterableParameter.getType().getWrappedType().getSimpleName());
+        assertEquals(0, iterableParameter.getValueForSerialization());
+        assertEquals("Iterator", iteratorParameter.getType().getWrappedType().getSimpleName());
+        assertEquals(0, iteratorParameter.getValueForSerialization());
+    }
+
     private void assertCanRoundTrip(Object object) {
-        assertEquals(object, fromObject(object).getValueForPlayback(null));
-        assertEquals(object, parseParameter(serializeParameter(fromObject(object))).getValueForPlayback(null));
+        assertEquals(object, factory.fromObject(object).getValueForPlayback(null));
+        assertEquals(object, parseParameter(serializeParameter(factory.fromObject(object))).getValueForPlayback(null));
     }
 
     private void assertCanRoundTripArray(boolean[] array) {
-        assertTrue(Arrays.equals(array, (boolean[]) fromObject(array).getValueForPlayback(null)));
-        assertTrue(Arrays.equals(array, (boolean[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null)));
+        assertTrue(Arrays.equals(array, (boolean[]) factory.fromObject(array).getValueForPlayback(null)));
+        assertTrue(Arrays.equals(array, (boolean[]) parseParameter(serializeParameter(factory.fromObject(array))).getValueForPlayback(null)));
     }
 
     private void assertCanRoundTripArray(byte[] array) {
-        assertArrayEquals(array, (byte[]) fromObject(array).getValueForPlayback(null));
-        assertArrayEquals(array, (byte[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
+        assertArrayEquals(array, (byte[]) factory.fromObject(array).getValueForPlayback(null));
+        assertArrayEquals(array, (byte[]) parseParameter(serializeParameter(factory.fromObject(array))).getValueForPlayback(null));
     }
 
     private void assertCanRoundTripArray(int[] array) {
-        assertArrayEquals(array, (int[]) fromObject(array).getValueForPlayback(null));
-        assertArrayEquals(array, (int[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
+        assertArrayEquals(array, (int[]) factory.fromObject(array).getValueForPlayback(null));
+        assertArrayEquals(array, (int[]) parseParameter(serializeParameter(factory.fromObject(array))).getValueForPlayback(null));
     }
 
     private void assertCanRoundTripArray(Object[] array) {
-        assertArrayEquals(array, (Object[]) fromObject(array).getValueForPlayback(null));
-        assertArrayEquals(array, (Object[]) parseParameter(serializeParameter(fromObject(array))).getValueForPlayback(null));
+        assertArrayEquals(array, (Object[]) factory.fromObject(array).getValueForPlayback(null));
+        assertArrayEquals(array, (Object[]) parseParameter(serializeParameter(factory.fromObject(array))).getValueForPlayback(null));
     }
 }

@@ -19,11 +19,18 @@
  */
 package org.neo4j.proxy.eventmodel;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.proxy.eventmodel.parameters.Parameter;
+import org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor;
 
 import java.util.Arrays;
 
 public class Event {
+
+    public interface Listener {
+        void onEvent(Event event);
+    }
+
     private Parameter target;
     private String methodName;
     private Parameter[] parameters;
@@ -44,6 +51,10 @@ public class Event {
 
     public Parameter[] getParameters() {
         return parameters;
+    }
+
+    public String toString() {
+        return JacksonAdaptor.serializeEvent(this).toString();
     }
 
     @Override
@@ -68,7 +79,4 @@ public class Event {
         return result;
     }
 
-    public interface Listener {
-        void onEvent(Event event);
-    }
 }

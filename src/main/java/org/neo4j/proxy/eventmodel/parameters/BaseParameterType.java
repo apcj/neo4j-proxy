@@ -43,4 +43,20 @@ public abstract class BaseParameterType implements ParameterType {
         return wrappedType.isAssignableFrom(object.getClass());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseParameterType)) return false;
+
+        BaseParameterType that = (BaseParameterType) o;
+
+        if (wrappedType != null ? !wrappedType.equals(that.wrappedType) : that.wrappedType != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return wrappedType != null ? wrappedType.hashCode() : 0;
+    }
 }

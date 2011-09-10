@@ -17,28 +17,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel;
+package org.neo4j.proxy;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.proxy.eventmodel.Event;
 
-/**
- * Created by IntelliJ IDEA.
- * User: apcj
- * Date: 08/09/2011
- * Time: 11:48
- * To change this template use File | Settings | File Templates.
- */
-public interface EntityFinder {
-    GraphDatabaseService getGraphDatabase();
+import java.util.List;
 
-    Transaction getCurrentTransaction();
+class EventListAccumulator implements Event.Listener {
+    private final List<Event> events;
 
-    Node getNode(long id);
+    public EventListAccumulator(List<Event> events) {
+        this.events = events;
+    }
 
-    Relationship getRelationship(long id);
-
-    Object findBySurrogateIdentifier(Class wrappedType, int surrogateIdentifier);
+    public void onEvent(Event event) {
+        events.add(event);
+    }
 }

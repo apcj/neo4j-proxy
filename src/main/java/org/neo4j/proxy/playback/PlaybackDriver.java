@@ -37,8 +37,8 @@ public class PlaybackDriver {
         for (Event event : events) {
             try {
                 Object target = event.getTarget().getValueForPlayback(playbackState);
-                Method method = deduceMethod(event, event.getTarget().getType().getWrappedType());
                 Object[] arguments = decodeParameters(event.getParameters());
+                Method method = deduceMethod(event, event.getTarget().getType().getWrappedType(), arguments);
 
                 Object result = method.invoke(target, arguments);
                 playbackState.capture(result);
@@ -58,9 +58,11 @@ public class PlaybackDriver {
         return decodedParameters;
     }
 
-    private Method deduceMethod(Event event, Class targetClass) {
+    private Method deduceMethod(Event event, Class targetClass, Object[] arguments) {
         for (Method candidateMethod : targetClass.getMethods()) {
-            if (candidateMethod.getName().equals(event.getMethodName())) {
+            System.out.println("candidateMethod = " + candidateMethod);
+            if (candidateMethod.getName().equals(event.getMethodName())
+                    && areCompatible(candidateMethod.getParameterTypes(), arguments)) {
                 return candidateMethod;
             }
         }
@@ -68,4 +70,15 @@ public class PlaybackDriver {
                 event.getMethodName(), targetClass));
     }
 
+    private boolean areCompatible(Class<?>[] parameterTypes, Object[] arguments) {
+        if (parameterTypes.length != arguments.length) {
+            return false;
+        }
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if (!parameterTypes[i].isAssignableFrom(arguments[i].getClass())) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

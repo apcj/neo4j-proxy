@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RecordReplayTest {
 
@@ -121,6 +122,13 @@ public class RecordReplayTest {
             relationship2.setProperty("effort", 1d);
             Relationship relationship3 = mattias.createRelationshipTo(storeRefactoring, RelationshipTypes.working_on);
             relationship3.setProperty("effort", 0.5d);
+
+            Iterable<Relationship> relationships = storeRefactoring.getRelationships(RelationshipTypes.working_on, Direction.INCOMING);
+            for (Relationship relationship : relationships) {
+                Node developer = relationship.getStartNode();
+                developer.setProperty("has_worked_on_store_refactoring", true);
+            }
+
             tx.success();
         } finally {
             tx.finish();
@@ -133,12 +141,14 @@ public class RecordReplayTest {
         int relationshipCount = 0;
         for (Relationship relationship : relationships) {
             relationshipCount++;
-            String name = (String) relationship.getStartNode().getProperty("name");
+            Node developer = relationship.getStartNode();
+            String name = (String) developer.getProperty("name");
             if (name.equals("Alistair") || name.equals("Chris")) {
                 assertEquals(1.0d, (Double) relationship.getProperty("effort"), 0.01d);
             } else {
                 assertEquals(0.5d, (Double) relationship.getProperty("effort"), 0.01d);
             }
+            assertTrue((Boolean) developer.getProperty("has_worked_on_store_refactoring"));
         }
         assertEquals(3, relationshipCount);
         readDatabase.shutdown();
@@ -148,15 +158,4 @@ public class RecordReplayTest {
         working_on
     }
 
-    private static class EventListAccumulator implements Event.Listener {
-        private final List<Event> events;
-
-        public EventListAccumulator(List<Event> events) {
-            this.events = events;
-        }
-
-        public void onEvent(Event event) {
-            events.add(event);
-        }
-    }
 }
