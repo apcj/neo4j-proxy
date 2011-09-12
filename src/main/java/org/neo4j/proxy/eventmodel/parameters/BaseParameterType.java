@@ -22,9 +22,11 @@ package org.neo4j.proxy.eventmodel.parameters;
 public abstract class BaseParameterType implements ParameterType {
 
     protected Class wrappedType;
+    protected Class serializedType;
 
-    public BaseParameterType(Class wrappedType) {
+    public BaseParameterType(Class wrappedType, Class serializedType) {
         this.wrappedType = wrappedType;
+        this.serializedType = serializedType;
     }
 
     public Class getWrappedType() {
@@ -32,7 +34,7 @@ public abstract class BaseParameterType implements ParameterType {
     }
 
     public Class getSerializedType() {
-        return wrappedType;
+        return serializedType;
     }
 
     public boolean acceptTypeName(String typeString) {

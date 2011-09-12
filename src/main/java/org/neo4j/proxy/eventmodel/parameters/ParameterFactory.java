@@ -32,117 +32,60 @@ public class ParameterFactory {
 
     public ParameterFactory() {
         types.add(new NullParameterType());
-        types.add(new BaseParameterType(GraphDatabaseService.class) {
-            public Class getSerializedType() {
-                return String.class;
-            }
+        types.add(new BaseParameterType(GraphDatabaseService.class, String.class) {
 
-            class GraphDatabaseServiceParameter extends BaseParameter {
-                protected GraphDatabaseServiceParameter(ParameterType type) {
-                    super(type);
-                }
-
-                public Object getValueForPlayback(EntityFinder entityFinder) {
-                    return entityFinder.getGraphDatabase();
-                }
-
-                public Object getValueForSerialization() {
-                    return "";
-                }
+            public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+                return entityFinder.getGraphDatabase();
             }
 
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new GraphDatabaseServiceParameter(this);
+                return new SerializableParameter(this, "");
             }
 
             public Parameter fromObject(Object entity) {
-                return new GraphDatabaseServiceParameter(this);
+                return new SerializableParameter(this, "");
             }
         });
-        types.add(new BaseParameterType(Transaction.class) {
-            public Class getSerializedType() {
-                return String.class;
+        types.add(new BaseParameterType(Transaction.class, String.class) {
+
+            public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+                return entityFinder.getCurrentTransaction();
             }
 
-            class TransactionParameter extends BaseParameter {
-                protected TransactionParameter(ParameterType type) {
-                    super(type);
-                }
-
-                public Object getValueForPlayback(EntityFinder entityFinder) {
-                    return entityFinder.getCurrentTransaction();
-                }
-
-                public Object getValueForSerialization() {
-                    return "";
-                }
-            }
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new TransactionParameter(this);
+                return new SerializableParameter(this, "");
             }
 
             public Parameter fromObject(Object entity) {
-                return new TransactionParameter(this);
+                return new SerializableParameter(this, "");
             }
         });
-        types.add(new BaseParameterType(Node.class) {
+        types.add(new BaseParameterType(Node.class, long.class) {
 
-            public Class getSerializedType() {
-                return long.class;
+            public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+                return entityFinder.getNode((Long) serializedValue);
             }
 
-            class NodeParameter extends BaseParameter {
-                private long id;
-
-                public NodeParameter(ParameterType type, long id) {
-                    super(type);
-                    this.id = id;
-                }
-
-                public Object getValueForPlayback(EntityFinder entityFinder) {
-                    return entityFinder.getNode(id);
-                }
-
-                public Object getValueForSerialization() {
-                    return id;
-                }
-            }
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new NodeParameter(this, (Long) serializedValue);
+                return new SerializableParameter(this, serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
-                return new NodeParameter(this, ((Node) entity).getId());
+                return new SerializableParameter(this, ((Node) entity).getId());
             }
         });
-        types.add(new BaseParameterType(Relationship.class) {
+        types.add(new BaseParameterType(Relationship.class, long.class) {
 
-            public Class getSerializedType() {
-                return long.class;
+            public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+                return entityFinder.getRelationship((Long) serializedValue);
             }
 
-            class RelationshipParameter extends BaseParameter {
-                private long id;
-
-                public RelationshipParameter(ParameterType type, long id) {
-                    super(type);
-                    this.id = id;
-                }
-
-                public Object getValueForPlayback(EntityFinder entityFinder) {
-                    return entityFinder.getRelationship(id);
-                }
-
-                public Object getValueForSerialization() {
-                    return id;
-                }
-            }
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new RelationshipParameter(this, (Long) serializedValue);
+                return new SerializableParameter(this, serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
-                return new RelationshipParameter(this, ((Relationship) entity).getId());
+                return new SerializableParameter(this, ((Relationship) entity).getId());
             }
         });
         types.add(new RelationshipTypeParameterType());
@@ -197,78 +140,39 @@ public class ParameterFactory {
     private class RelationshipTypeParameterType extends BaseParameterType {
 
         public RelationshipTypeParameterType() {
-            super(RelationshipType.class);
+            super(RelationshipType.class, String.class);
         }
 
-        public Class getSerializedType() {
-            return String.class;
-        }
-
-        class RelationshipTypeParameter implements Parameter {
-            private String name;
-
-            RelationshipTypeParameter(String name) {
-                this.name = name;
-            }
-
-            public ParameterType getType() {
-                return RelationshipTypeParameterType.this;
-            }
-
-            public Object getValueForPlayback(EntityFinder entityFinder) {
-                return new StandInRelationshipType(name);
-            }
-
-            public Object getValueForSerialization() {
-                return name;
-            }
+        public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+            return new StandInRelationshipType((String) serializedValue);
         }
 
         public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-            return new RelationshipTypeParameter((String) serializedValue);
+            return new SerializableParameter(this, serializedValue);
         }
 
         public Parameter fromObject(Object entity) {
-            return new RelationshipTypeParameter(((RelationshipType) entity).name());
+            return new SerializableParameter(this, ((RelationshipType) entity).name());
         }
     }
 
     private class RelationshipTypeArrayParameterType extends BaseParameterType {
 
         public RelationshipTypeArrayParameterType() {
-            super(RelationshipType[].class);
+            super(RelationshipType[].class, String[].class);
         }
 
-        public Class getSerializedType() {
-            return String.class;
-        }
-
-        class RelationshipTypeArrayParameter implements Parameter {
-            private String[] names;
-
-            RelationshipTypeArrayParameter(String[] names) {
-                this.names = names;
+        public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+            String[] names = (String[]) serializedValue;
+            RelationshipType[] relationshipTypes = new RelationshipType[names.length];
+            for (int i = 0; i < names.length; i++) {
+                relationshipTypes[i] = new StandInRelationshipType(names[i]);
             }
-
-            public ParameterType getType() {
-                return RelationshipTypeArrayParameterType.this;
-            }
-
-            public Object getValueForPlayback(EntityFinder entityFinder) {
-                RelationshipType[] relationshipTypes = new RelationshipType[names.length];
-                for (int i = 0; i < names.length; i++) {
-                    relationshipTypes[i] = new StandInRelationshipType(names[i]);
-                }
-                return relationshipTypes;
-            }
-
-            public Object getValueForSerialization() {
-                return names;
-            }
+            return relationshipTypes;
         }
 
         public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-            return new RelationshipTypeArrayParameter((String[]) serializedValue);
+            return new SerializableParameter(this, (String[]) serializedValue);
         }
 
         public Parameter fromObject(Object entity) {
@@ -277,7 +181,7 @@ public class ParameterFactory {
             for (int i = 0; i < relationshipTypes.length; i++) {
                 names[i] = relationshipTypes[i].name();
             }
-            return new RelationshipTypeArrayParameter(names);
+            return new SerializableParameter(this, names);
         }
     }
 

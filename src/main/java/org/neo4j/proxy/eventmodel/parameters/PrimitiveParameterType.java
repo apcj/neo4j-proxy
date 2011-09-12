@@ -23,50 +23,18 @@ import org.neo4j.proxy.eventmodel.EntityFinder;
 
 public class PrimitiveParameterType extends BaseParameterType {
     public PrimitiveParameterType(Class primitiveType) {
-        super(primitiveType);
+        super(primitiveType, primitiveType);
     }
 
-    class PrimitiveParameter implements Parameter {
-
-        private Object value;
-
-        PrimitiveParameter(Object value) {
-            this.value = value;
-        }
-
-        public ParameterType getType() {
-            return PrimitiveParameterType.this;
-        }
-
-        public Object getValueForPlayback(EntityFinder entityFinder) {
-            return value;
-        }
-
-        public Object getValueForSerialization() {
-            return value;
-        }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            PrimitiveParameter that = (PrimitiveParameter) o;
-
-            if (value != null ? !value.equals(that.value) : that.value != null) return false;
-
-            return true;
-        }
-
-        public int hashCode() {
-            return value != null ? value.hashCode() : 0;
-        }
+    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+        return serializedValue;
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new PrimitiveParameter(serializedValue);
+        return new SerializableParameter(this, serializedValue);
     }
 
     public Parameter fromObject(Object entity) {
-        return new PrimitiveParameter(entity);
+        return new SerializableParameter(this, entity);
     }
 }

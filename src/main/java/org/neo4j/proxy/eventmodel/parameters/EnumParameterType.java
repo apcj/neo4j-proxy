@@ -23,39 +23,19 @@ import org.neo4j.proxy.eventmodel.EntityFinder;
 
 public class EnumParameterType extends BaseParameterType {
 
-    public EnumParameterType(Class<?> wrappedType) {
-        super(wrappedType);
-    }
-
-    public Class getSerializedType() {
-        return String.class;
-    }
-
-    class EnumParameter implements Parameter {
-        private Object value;
-
-        EnumParameter(Object value) {
-            this.value = value;
-        }
-
-        public ParameterType getType() {
-            return EnumParameterType.this;
-        }
-
-        public Object getValueForPlayback(EntityFinder entityFinder) {
-            return value;
-        }
-
-        public Object getValueForSerialization() {
-            return ((Enum) value).name();
-        }
+    public EnumParameterType(Class wrappedType) {
+        super(wrappedType, String.class);
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new EnumParameter(Enum.valueOf(wrappedType, (String) serializedValue));
+        return new SerializableParameter(this, serializedValue);
     }
 
     public Parameter fromObject(Object entity) {
-        return new EnumParameter(entity);
+        return new SerializableParameter(this, ((Enum) entity).name());
+    }
+
+    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+        return Enum.valueOf(wrappedType, (String) serializedValue);
     }
 }

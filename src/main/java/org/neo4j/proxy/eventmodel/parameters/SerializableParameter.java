@@ -19,33 +19,44 @@
  */
 package org.neo4j.proxy.eventmodel.parameters;
 
-public abstract class BaseParameter implements Parameter {
+import org.neo4j.proxy.eventmodel.EntityFinder;
+
+public class SerializableParameter implements Parameter {
 
     private ParameterType type;
+    private Object value;
 
-    protected BaseParameter(ParameterType type) {
+    public SerializableParameter(ParameterType type, Object value) {
         this.type = type;
+        this.value = value;
     }
 
     public ParameterType getType() {
         return type;
     }
 
+    public Object getValueForPlayback(EntityFinder entityFinder) {
+        return type.getValueForPlayback(value, entityFinder);
+    }
+
+    public Object getValueForSerialization() {
+        return value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BaseParameter)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        BaseParameter that = (BaseParameter) o;
+        SerializableParameter that = (SerializableParameter) o;
 
-        if (type != null ? !type.equals(that.type) : that.type != null) return false;
-        if (getValueForSerialization() != null ? !getValueForSerialization().equals(that.getValueForSerialization()) : that.getValueForSerialization() != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return type != null ? type.hashCode() : 0;
+        return value != null ? value.hashCode() : 0;
     }
 }

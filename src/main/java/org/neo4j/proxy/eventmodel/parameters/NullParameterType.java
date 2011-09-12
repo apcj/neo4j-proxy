@@ -30,21 +30,6 @@ public class NullParameterType implements ParameterType {
         return String.class;
     }
 
-    class NullParameter implements Parameter {
-
-        public ParameterType getType() {
-            return NullParameterType.this;
-        }
-
-        public Object getValueForPlayback(EntityFinder entityFinder) {
-            return null;
-        }
-
-        public Object getValueForSerialization() {
-            return "";
-        }
-    }
-
     public boolean acceptTypeName(String typeString) {
         return Null.class.getSimpleName().equals(typeString);
     }
@@ -54,10 +39,14 @@ public class NullParameterType implements ParameterType {
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new NullParameter();
+        return new SerializableParameter(this, "");
     }
 
     public Parameter fromObject(Object entity) {
-        return new NullParameter();
+        return new SerializableParameter(this, "");
+    }
+
+    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+        return null;
     }
 }

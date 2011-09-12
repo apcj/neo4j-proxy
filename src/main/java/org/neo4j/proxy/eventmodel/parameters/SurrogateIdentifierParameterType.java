@@ -26,38 +26,18 @@ class SurrogateIdentifierParameterType extends BaseParameterType {
     private int idSequence = 0;
 
     public SurrogateIdentifierParameterType(Class wrappedType) {
-        super(wrappedType);
+        super(wrappedType, int.class);
     }
 
-    class LongIdentifiedParameter implements Parameter {
-        private int id;
-
-        public LongIdentifiedParameter(int id) {
-            this.id = id;
-        }
-
-        public ParameterType getType() {
-            return SurrogateIdentifierParameterType.this;
-        }
-
-        public Object getValueForPlayback(EntityFinder entityFinder) {
-            return entityFinder.findBySurrogateIdentifier(getWrappedType(), id);
-        }
-
-        public Object getValueForSerialization() {
-            return id;
-        }
-    }
-
-    public Class getSerializedType() {
-        return int.class;
+    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+        return entityFinder.findBySurrogateIdentifier(getWrappedType(), (Integer) serializedValue);
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new LongIdentifiedParameter((Integer) serializedValue);
+        return new SerializableParameter(this, serializedValue);
     }
 
     public Parameter fromObject(Object entity) {
-        return new LongIdentifiedParameter(idSequence++);
+        return new SerializableParameter(this, idSequence++);
     }
 }

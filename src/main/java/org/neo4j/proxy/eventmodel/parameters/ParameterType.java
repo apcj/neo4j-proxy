@@ -19,6 +19,8 @@
  */
 package org.neo4j.proxy.eventmodel.parameters;
 
+import org.neo4j.proxy.eventmodel.EntityFinder;
+
 public interface ParameterType {
     Class getWrappedType();
     Class getSerializedType();
@@ -26,4 +28,6 @@ public interface ParameterType {
     boolean acceptObject(Object object);
     Parameter fromSerializedValue(String typeString, Object serializedValue);
     public Parameter fromObject(Object entity);
+
+    Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder);
 }
