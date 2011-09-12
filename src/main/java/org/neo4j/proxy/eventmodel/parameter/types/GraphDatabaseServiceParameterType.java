@@ -17,25 +17,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel.parameters;
+package org.neo4j.proxy.eventmodel.parameter.types;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.proxy.eventmodel.EntityFinder;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class NullParameterType implements ParameterType {
-    public Class getWrappedType() {
-        return Null.class;
+public class GraphDatabaseServiceParameterType extends BaseParameterType {
+
+    public GraphDatabaseServiceParameterType() {
+        super(GraphDatabaseService.class, String.class);
     }
 
-    public Class getSerializedType() {
-        return String.class;
-    }
-
-    public boolean acceptTypeName(String typeString) {
-        return Null.class.getSimpleName().equals(typeString);
-    }
-
-    public boolean acceptObject(Object object) {
-        return object == null;
+    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+        return entityFinder.getGraphDatabase();
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
@@ -44,9 +39,5 @@ public class NullParameterType implements ParameterType {
 
     public Parameter fromObject(Object entity) {
         return new Parameter(this, "");
-    }
-
-    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
-        return null;
     }
 }

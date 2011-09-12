@@ -17,17 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel.parameters;
+package org.neo4j.proxy.eventmodel.parameter.types;
 
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.proxy.eventmodel.EntityFinder;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
+import org.neo4j.proxy.eventmodel.parameter.types.BaseParameterType;
 
-public class PrimitiveParameterType extends BaseParameterType {
-    public PrimitiveParameterType(Class primitiveType) {
-        super(primitiveType, primitiveType);
+public class RelationshipParameterType extends BaseParameterType {
+
+    public RelationshipParameterType() {
+        super(Relationship.class, long.class);
     }
 
     public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
-        return serializedValue;
+        return entityFinder.getRelationship((Long) serializedValue);
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
@@ -35,6 +39,6 @@ public class PrimitiveParameterType extends BaseParameterType {
     }
 
     public Parameter fromObject(Object entity) {
-        return new Parameter(this, entity);
+        return new Parameter(this, ((Relationship) entity).getId());
     }
 }

@@ -17,14 +17,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel.parameters;
+package org.neo4j.proxy.eventmodel.parameter.types;
 
+import org.neo4j.graphdb.Node;
 import org.neo4j.proxy.eventmodel.EntityFinder;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class EnumParameterType extends BaseParameterType {
+public class NodeParameterType extends BaseParameterType {
 
-    public EnumParameterType(Class wrappedType) {
-        super(wrappedType, String.class);
+    public NodeParameterType() {
+        super(Node.class, long.class);
+    }
+
+    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
+        return entityFinder.getNode((Long) serializedValue);
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
@@ -32,10 +38,6 @@ public class EnumParameterType extends BaseParameterType {
     }
 
     public Parameter fromObject(Object entity) {
-        return new Parameter(this, ((Enum) entity).name());
-    }
-
-    public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
-        return Enum.valueOf(wrappedType, (String) serializedValue);
+        return new Parameter(this, ((Node) entity).getId());
     }
 }

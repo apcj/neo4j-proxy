@@ -25,9 +25,9 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.parameters.Parameter;
-import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
-import org.neo4j.proxy.eventmodel.parameters.ParameterType;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
+import org.neo4j.proxy.eventmodel.parameter.ParameterFactory;
+import org.neo4j.proxy.eventmodel.parameter.types.ParameterType;
 
 import java.io.IOException;
 import java.util.ArrayList;

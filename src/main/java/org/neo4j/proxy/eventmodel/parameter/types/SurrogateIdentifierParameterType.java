@@ -17,11 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel.parameters;
+package org.neo4j.proxy.eventmodel.parameter.types;
 
 import org.neo4j.proxy.eventmodel.EntityFinder;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-class SurrogateIdentifierParameterType extends BaseParameterType {
+public class SurrogateIdentifierParameterType extends BaseParameterType {
 
     private int idSequence = 0;
 

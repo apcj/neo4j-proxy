@@ -23,8 +23,8 @@ import org.junit.Test;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Traverser;
-import org.neo4j.proxy.eventmodel.parameters.Parameter;
-import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
+import org.neo4j.proxy.eventmodel.parameter.ParameterFactory;
 
 import java.util.Arrays;
 import java.util.Iterator;

@@ -21,8 +21,8 @@ package org.neo4j.proxy.eventmodel.serialization;
 
 import org.junit.Test;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.parameters.Parameter;
-import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
+import org.neo4j.proxy.eventmodel.parameter.ParameterFactory;
 
 import java.io.PrintWriter;
 

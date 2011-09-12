@@ -19,8 +19,7 @@
  */
 package org.neo4j.proxy.eventmodel;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.neo4j.proxy.eventmodel.parameters.Parameter;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
 import org.neo4j.proxy.eventmodel.serialization.JacksonAdaptor;
 
 import java.util.Arrays;

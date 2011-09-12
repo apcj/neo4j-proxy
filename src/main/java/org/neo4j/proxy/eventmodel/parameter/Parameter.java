@@ -17,48 +17,47 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.proxy.eventmodel.parameters;
+package org.neo4j.proxy.eventmodel.parameter;
 
-public abstract class BaseParameterType implements ParameterType {
+import org.neo4j.proxy.eventmodel.EntityFinder;
+import org.neo4j.proxy.eventmodel.parameter.types.ParameterType;
 
-    protected Class wrappedType;
-    protected Class serializedType;
+public class Parameter {
 
-    public BaseParameterType(Class wrappedType, Class serializedType) {
-        this.wrappedType = wrappedType;
-        this.serializedType = serializedType;
+    private ParameterType type;
+    private Object value;
+
+    public Parameter(ParameterType type, Object value) {
+        this.type = type;
+        this.value = value;
     }
 
-    public Class getWrappedType() {
-        return wrappedType;
+    public ParameterType getType() {
+        return type;
     }
 
-    public Class getSerializedType() {
-        return serializedType;
+    public Object getValueForPlayback(EntityFinder entityFinder) {
+        return type.getValueForPlayback(value, entityFinder);
     }
 
-    public boolean acceptTypeName(String typeString) {
-        return wrappedType.getSimpleName().equals(typeString);
-    }
-
-    public boolean acceptObject(Object object) {
-        return wrappedType.isAssignableFrom(object.getClass());
+    public Object getValueForSerialization() {
+        return value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BaseParameterType)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        BaseParameterType that = (BaseParameterType) o;
+        Parameter that = (Parameter) o;
 
-        if (wrappedType != null ? !wrappedType.equals(that.wrappedType) : that.wrappedType != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return wrappedType != null ? wrappedType.hashCode() : 0;
+        return value != null ? value.hashCode() : 0;
     }
 }

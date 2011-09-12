@@ -24,8 +24,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.Event;
-import org.neo4j.proxy.eventmodel.parameters.Parameter;
-import org.neo4j.proxy.eventmodel.parameters.ParameterFactory;
+import org.neo4j.proxy.eventmodel.parameter.Parameter;
+import org.neo4j.proxy.eventmodel.parameter.ParameterFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
