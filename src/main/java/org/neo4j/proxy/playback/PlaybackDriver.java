@@ -27,6 +27,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class PlaybackDriver {
+
+    public interface Listener {
+        void beforePlayback(Event event);
+        void afterPlayback(Event event);
+        void playbackException(Event event, Exception exception);
+    }
+
     private PlaybackState playbackState;
 
     public PlaybackDriver(GraphDatabaseService graphDatabase) {
@@ -34,18 +41,28 @@ public class PlaybackDriver {
     }
 
     public void playback(Iterable<Event> events) {
+        playback(events, new HaltOnException());
+    }
+
+    public void playback(Iterable<Event> events, Listener listener) {
         for (Event event : events) {
             try {
+                listener.beforePlayback(event);
+
                 Object target = event.getTarget().getValueForPlayback(playbackState);
                 Object[] arguments = decodeParameters(event.getParameters());
                 Method method = deduceMethod(event, event.getTarget().getType().getWrappedType(), arguments);
 
                 Object result = method.invoke(target, arguments);
                 playbackState.capture(result);
+
+                listener.afterPlayback(event);
             } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
+                listener.playbackException(event, e);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                listener.playbackException(event, e);
+            } catch (RuntimeException e) {
+                listener.playbackException(event, e);
             }
         }
     }
@@ -60,7 +77,6 @@ public class PlaybackDriver {
 
     private Method deduceMethod(Event event, Class targetClass, Object[] arguments) {
         for (Method candidateMethod : targetClass.getMethods()) {
-            System.out.println("candidateMethod = " + candidateMethod);
             if (candidateMethod.getName().equals(event.getMethodName())
                     && areCompatible(candidateMethod.getParameterTypes(), arguments)) {
                 return candidateMethod;
@@ -80,5 +96,17 @@ public class PlaybackDriver {
             }
         }
         return true;
+    }
+
+    public static class HaltOnException implements Listener {
+        public void beforePlayback(Event event) {
+        }
+
+        public void afterPlayback(Event event) {
+        }
+
+        public void playbackException(Event event, Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
