@@ -34,10 +34,10 @@ class SurrogateIdentifierParameterType extends BaseParameterType {
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new SerializableParameter(this, serializedValue);
+        return new Parameter(this, serializedValue);
     }
 
     public Parameter fromObject(Object entity) {
-        return new SerializableParameter(this, idSequence++);
+        return new Parameter(this, idSequence++);
     }
 }

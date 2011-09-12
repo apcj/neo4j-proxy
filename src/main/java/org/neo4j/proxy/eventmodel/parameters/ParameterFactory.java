@@ -39,11 +39,11 @@ public class ParameterFactory {
             }
 
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new SerializableParameter(this, "");
+                return new Parameter(this, "");
             }
 
             public Parameter fromObject(Object entity) {
-                return new SerializableParameter(this, "");
+                return new Parameter(this, "");
             }
         });
         types.add(new BaseParameterType(Transaction.class, String.class) {
@@ -53,11 +53,11 @@ public class ParameterFactory {
             }
 
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new SerializableParameter(this, "");
+                return new Parameter(this, "");
             }
 
             public Parameter fromObject(Object entity) {
-                return new SerializableParameter(this, "");
+                return new Parameter(this, "");
             }
         });
         types.add(new BaseParameterType(Node.class, long.class) {
@@ -67,11 +67,11 @@ public class ParameterFactory {
             }
 
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new SerializableParameter(this, serializedValue);
+                return new Parameter(this, serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
-                return new SerializableParameter(this, ((Node) entity).getId());
+                return new Parameter(this, ((Node) entity).getId());
             }
         });
         types.add(new BaseParameterType(Relationship.class, long.class) {
@@ -81,11 +81,11 @@ public class ParameterFactory {
             }
 
             public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-                return new SerializableParameter(this, serializedValue);
+                return new Parameter(this, serializedValue);
             }
 
             public Parameter fromObject(Object entity) {
-                return new SerializableParameter(this, ((Relationship) entity).getId());
+                return new Parameter(this, ((Relationship) entity).getId());
             }
         });
         types.add(new RelationshipTypeParameterType());
@@ -148,11 +148,11 @@ public class ParameterFactory {
         }
 
         public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-            return new SerializableParameter(this, serializedValue);
+            return new Parameter(this, serializedValue);
         }
 
         public Parameter fromObject(Object entity) {
-            return new SerializableParameter(this, ((RelationshipType) entity).name());
+            return new Parameter(this, ((RelationshipType) entity).name());
         }
     }
 
@@ -172,7 +172,7 @@ public class ParameterFactory {
         }
 
         public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-            return new SerializableParameter(this, (String[]) serializedValue);
+            return new Parameter(this, (String[]) serializedValue);
         }
 
         public Parameter fromObject(Object entity) {
@@ -181,7 +181,7 @@ public class ParameterFactory {
             for (int i = 0; i < relationshipTypes.length; i++) {
                 names[i] = relationshipTypes[i].name();
             }
-            return new SerializableParameter(this, names);
+            return new Parameter(this, names);
         }
     }
 

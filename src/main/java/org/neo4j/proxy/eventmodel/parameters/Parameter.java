@@ -21,11 +21,42 @@ package org.neo4j.proxy.eventmodel.parameters;
 
 import org.neo4j.proxy.eventmodel.EntityFinder;
 
-public interface Parameter {
+public class Parameter {
 
-    ParameterType getType();
+    private ParameterType type;
+    private Object value;
 
-    Object getValueForPlayback(EntityFinder entityFinder);
+    public Parameter(ParameterType type, Object value) {
+        this.type = type;
+        this.value = value;
+    }
 
-    Object getValueForSerialization();
+    public ParameterType getType() {
+        return type;
+    }
+
+    public Object getValueForPlayback(EntityFinder entityFinder) {
+        return type.getValueForPlayback(value, entityFinder);
+    }
+
+    public Object getValueForSerialization() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Parameter that = (Parameter) o;
+
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return value != null ? value.hashCode() : 0;
+    }
 }

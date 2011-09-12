@@ -31,10 +31,10 @@ public class PrimitiveParameterType extends BaseParameterType {
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new SerializableParameter(this, serializedValue);
+        return new Parameter(this, serializedValue);
     }
 
     public Parameter fromObject(Object entity) {
-        return new SerializableParameter(this, entity);
+        return new Parameter(this, entity);
     }
 }

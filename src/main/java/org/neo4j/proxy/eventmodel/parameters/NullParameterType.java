@@ -39,11 +39,11 @@ public class NullParameterType implements ParameterType {
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new SerializableParameter(this, "");
+        return new Parameter(this, "");
     }
 
     public Parameter fromObject(Object entity) {
-        return new SerializableParameter(this, "");
+        return new Parameter(this, "");
     }
 
     public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {

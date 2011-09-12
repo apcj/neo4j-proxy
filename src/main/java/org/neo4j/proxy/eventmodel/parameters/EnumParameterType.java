@@ -28,11 +28,11 @@ public class EnumParameterType extends BaseParameterType {
     }
 
     public Parameter fromSerializedValue(String typeString, Object serializedValue) {
-        return new SerializableParameter(this, serializedValue);
+        return new Parameter(this, serializedValue);
     }
 
     public Parameter fromObject(Object entity) {
-        return new SerializableParameter(this, ((Enum) entity).name());
+        return new Parameter(this, ((Enum) entity).name());
     }
 
     public Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder) {
