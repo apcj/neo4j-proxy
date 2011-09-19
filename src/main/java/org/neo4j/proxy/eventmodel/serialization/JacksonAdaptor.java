@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class JacksonAdaptor {
 
@@ -73,11 +74,12 @@ public class JacksonAdaptor {
     public static JsonNode serializeParameter(Parameter argument) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
 
-        node.put("type", argument.getType().getWrappedType().getSimpleName());
+        String type = argument.getType().getWrappedType().getSimpleName();
 
         Object value = argument.getValueForSerialization();
         value = workAroundProblemWithSerializationOfPrimitiveByteArrays(value);
-        node.put("value", mapper.<JsonNode>valueToTree(value));
+
+        node.put(type, mapper.<JsonNode>valueToTree(value));
 
         return node;
     }
@@ -97,11 +99,16 @@ public class JacksonAdaptor {
     private static final ParameterFactory parameterFactory = new ParameterFactory();
 
     public static Parameter parseParameter(JsonNode jsonNode) {
-        String typeName = jsonNode.get("type").getTextValue();
+        Iterator<Map.Entry<String, JsonNode>> fields = ((ObjectNode) jsonNode).getFields();
+        Map.Entry<String, JsonNode> entry = fields.next();
+        if (fields.hasNext()) {
+            throw new IllegalArgumentException("Parameter should only have one field");
+        }
+        String typeName = entry.getKey();
         for (ParameterType type : parameterFactory.types) {
             if (type.acceptTypeName(typeName)) {
                 try {
-                    Object serializedValue = mapper.<Object>treeToValue(jsonNode.get("value"), type.getSerializedType());
+                    Object serializedValue = mapper.<Object>treeToValue(entry.getValue(), type.getSerializedType());
                     return type.fromSerializedValue(typeName, serializedValue);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
