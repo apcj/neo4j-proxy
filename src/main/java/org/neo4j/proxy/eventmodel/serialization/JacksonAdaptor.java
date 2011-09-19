@@ -42,16 +42,16 @@ public class JacksonAdaptor {
     public static JsonNode serializeEvent(Event event) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("target", serializeParameter(event.getTarget()));
-        node.put("methodName", event.getMethodName());
-        node.put("arguments", serializeArguments(event.getParameters()));
+        node.put("method", event.getMethodName());
+        node.put("args", serializeArguments(event.getParameters()));
         return node;
     }
 
     public static Event parseEvent(JsonNode node) {
         return new Event(
                 parseParameter(node.get("target")),
-                node.get("methodName").getTextValue(),
-                parseArguments(node.get("arguments")));
+                node.get("method").getTextValue(),
+                parseArguments(node.get("args")));
     }
 
     public static JsonNode serializeArguments(Parameter[] arguments) {
