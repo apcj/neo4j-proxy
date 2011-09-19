@@ -44,6 +44,7 @@ public class JacksonAdaptor {
         node.put("target", serializeParameter(event.getTarget()));
         node.put("method", event.getMethodName());
         node.put("args", serializeArguments(event.getParameters()));
+        node.put("result", serializeParameter(event.getResult()));
         return node;
     }
 
@@ -51,7 +52,8 @@ public class JacksonAdaptor {
         return new Event(
                 parseParameter(node.get("target")),
                 node.get("method").getTextValue(),
-                parseArguments(node.get("args")));
+                parseArguments(node.get("args")),
+                parseParameter(node.get("result")));
     }
 
     public static JsonNode serializeArguments(Parameter[] arguments) {

@@ -33,11 +33,13 @@ public class Event {
     private Parameter target;
     private String methodName;
     private Parameter[] parameters;
+    private Parameter result;
 
-    public Event(Parameter target, String methodName, Parameter[] parameters) {
+    public Event(Parameter target, String methodName, Parameter[] parameters, Parameter result) {
         this.target = target;
         this.methodName = methodName;
         this.parameters = parameters;
+        this.result = result;
     }
 
     public Parameter getTarget() {
@@ -50,6 +52,10 @@ public class Event {
 
     public Parameter[] getParameters() {
         return parameters;
+    }
+
+    public Parameter getResult() {
+        return result;
     }
 
     public String toString() {

@@ -41,7 +41,7 @@ public class JacksonSerializerTest {
     @Test
     public void canRoundTripViaJson()
     {
-        Event event = new Event(factory.fromObject(node(20)), "method", new Parameter[] {factory.fromObject("name"), factory.fromObject("Alistair")});
+        Event event = new Event(factory.fromObject(node(20)), "method", new Parameter[] {factory.fromObject("name"), factory.fromObject("Alistair")}, factory.fromObject(null));
 
         assertEquals(event, parseEvent(serializeEvent(event)));
 
@@ -52,7 +52,7 @@ public class JacksonSerializerTest {
     public void shouldPrintEachEvent() throws Exception {
         PrintWriter printWriter = mock(PrintWriter.class);
 
-        Event event = new Event(factory.fromObject(node(20)), "method", new Parameter[] {factory.fromObject("name"), factory.fromObject("Alistair")});
+        Event event = new Event(factory.fromObject(node(20)), "method", new Parameter[] {factory.fromObject("name"), factory.fromObject("Alistair")}, factory.fromObject(null));
         new JacksonSerializer(printWriter).onEvent(event);
 
         verify(printWriter).println(anyString());

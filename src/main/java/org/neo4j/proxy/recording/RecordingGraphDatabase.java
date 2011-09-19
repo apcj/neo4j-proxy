@@ -36,25 +36,30 @@ public class RecordingGraphDatabase {
 
     public static GraphDatabaseService create(final Event.Listener listener, final GraphDatabaseService delegate) {
         final Event.Listener filteredListener = new FilterOutUninterestingMethods(listener);
-        return createProxy(filteredListener, delegate, GraphDatabaseService.class, new ParameterFactory());
+        ParameterFactory parameterFactory = new ParameterFactory();
+        return createProxy(filteredListener, delegate, parameterFactory.fromObject(delegate), GraphDatabaseService.class, parameterFactory);
     }
 
-    public static <T> T createProxy(final Event.Listener listener, final T delegate, final Class aClass, final ParameterFactory parameterFactory) {
-        final Parameter targetParameter = parameterFactory.fromObjectWithSpecificType(delegate, aClass);
+    public static <T> T createProxy(final Event.Listener listener, final T delegate, final Parameter targetParameter, final Class aClass, final ParameterFactory parameterFactory) {
 
         //noinspection unchecked
         return (T) Proxy.newProxyInstance(RecordingGraphDatabase.class.getClassLoader(), new Class[]{aClass}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] arguments) throws Throwable {
 
+                final Object result = method.invoke(delegate, arguments);
                 try {
-                    listener.onEvent(new Event(targetParameter, method.getName(), convert(arguments, parameterFactory)));
+                    if (result instanceof Node || result instanceof Relationship || result instanceof Transaction
+                            || result instanceof Iterable || result instanceof Iterator) {
+                        Class<?> proxyInterface = chooseProxyInterface(method, result);
+                        final Parameter resultParameter = parameterFactory.fromObjectWithSpecificType(result, proxyInterface);
+                        listener.onEvent(new Event(targetParameter, method.getName(), convert(arguments, parameterFactory), resultParameter));
+                        return createProxy(listener, result, resultParameter, proxyInterface, parameterFactory);
+                    } else {
+                        final Parameter resultParameter = parameterFactory.fromObject(result);
+                        listener.onEvent(new Event(targetParameter, method.getName(), convert(arguments, parameterFactory), resultParameter));
+                    }
                 } catch (RuntimeException e) {
                     e.printStackTrace();
-                }
-                final Object result = method.invoke(delegate, arguments);
-                if (result instanceof Node || result instanceof Relationship || result instanceof Transaction
-                        || result instanceof Iterable || result instanceof Iterator) {
-                    return createProxy(listener, result, chooseProxyInterface(method, result), parameterFactory);
                 }
                 return result;
             }
