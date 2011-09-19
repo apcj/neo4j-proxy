@@ -23,7 +23,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class NodeParameterType extends BaseParameterType {
+public class NodeParameterType extends ParameterType {
 
     public NodeParameterType() {
         super(Node.class, long.class);

@@ -22,9 +22,8 @@ package org.neo4j.proxy.eventmodel.parameter.types;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
-import org.neo4j.proxy.eventmodel.parameter.types.BaseParameterType;
 
-public class RelationshipParameterType extends BaseParameterType {
+public class RelationshipParameterType extends ParameterType {
 
     public RelationshipParameterType() {
         super(Relationship.class, long.class);

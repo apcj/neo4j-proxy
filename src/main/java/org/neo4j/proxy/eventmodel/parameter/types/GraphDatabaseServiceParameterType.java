@@ -23,7 +23,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class GraphDatabaseServiceParameterType extends BaseParameterType {
+public class GraphDatabaseServiceParameterType extends ParameterType {
 
     public GraphDatabaseServiceParameterType() {
         super(GraphDatabaseService.class, String.class);

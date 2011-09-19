@@ -22,13 +22,10 @@ package org.neo4j.proxy.eventmodel.parameter.types;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class NullParameterType implements ParameterType {
-    public Class getWrappedType() {
-        return Null.class;
-    }
+public class NullParameterType extends ParameterType {
 
-    public Class getSerializedType() {
-        return String.class;
+    public NullParameterType() {
+        super(Null.class, String.class);
     }
 
     public boolean acceptTypeName(String typeString) {

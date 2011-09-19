@@ -22,13 +22,52 @@ package org.neo4j.proxy.eventmodel.parameter.types;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public interface ParameterType {
-    Class getWrappedType();
-    Class getSerializedType();
-    boolean acceptTypeName(String typeString);
-    boolean acceptObject(Object object);
-    Parameter fromSerializedValue(String typeString, Object serializedValue);
-    public Parameter fromObject(Object entity);
+public abstract class ParameterType {
 
-    Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder);
+    protected Class wrappedType;
+    protected Class serializedType;
+
+    public ParameterType(Class wrappedType, Class serializedType) {
+        this.wrappedType = wrappedType;
+        this.serializedType = serializedType;
+    }
+
+    public Class getWrappedType() {
+        return wrappedType;
+    }
+
+    public Class getSerializedType() {
+        return serializedType;
+    }
+
+    public boolean acceptTypeName(String typeString) {
+        return wrappedType.getSimpleName().equals(typeString);
+    }
+
+    public boolean acceptObject(Object object) {
+        return wrappedType.isAssignableFrom(object.getClass());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ParameterType)) return false;
+
+        ParameterType that = (ParameterType) o;
+
+        if (wrappedType != null ? !wrappedType.equals(that.wrappedType) : that.wrappedType != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return wrappedType != null ? wrappedType.hashCode() : 0;
+    }
+
+    public abstract Object getValueForPlayback(Object serializedValue, EntityFinder entityFinder);
+
+    public abstract Parameter fromSerializedValue(String typeString, Object serializedValue);
+
+    public abstract Parameter fromObject(Object entity);
 }

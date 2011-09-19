@@ -22,7 +22,7 @@ package org.neo4j.proxy.eventmodel.parameter.types;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class SurrogateIdentifierParameterType extends BaseParameterType {
+public class SurrogateIdentifierParameterType extends ParameterType {
 
     private int idSequence = 0;
 

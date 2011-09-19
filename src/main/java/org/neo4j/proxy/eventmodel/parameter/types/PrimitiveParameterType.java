@@ -22,7 +22,7 @@ package org.neo4j.proxy.eventmodel.parameter.types;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class PrimitiveParameterType extends BaseParameterType {
+public class PrimitiveParameterType extends ParameterType {
     public PrimitiveParameterType(Class primitiveType) {
         super(primitiveType, primitiveType);
     }

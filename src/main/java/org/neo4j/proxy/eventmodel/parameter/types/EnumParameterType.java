@@ -22,7 +22,7 @@ package org.neo4j.proxy.eventmodel.parameter.types;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class EnumParameterType extends BaseParameterType {
+public class EnumParameterType extends ParameterType {
 
     public EnumParameterType(Class wrappedType) {
         super(wrappedType, String.class);

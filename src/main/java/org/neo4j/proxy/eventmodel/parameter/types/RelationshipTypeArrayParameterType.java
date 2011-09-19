@@ -23,7 +23,7 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class RelationshipTypeArrayParameterType extends BaseParameterType {
+public class RelationshipTypeArrayParameterType extends ParameterType {
 
     public RelationshipTypeArrayParameterType() {
         super(RelationshipType[].class, String[].class);

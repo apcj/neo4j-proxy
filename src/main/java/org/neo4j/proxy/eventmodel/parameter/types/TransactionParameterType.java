@@ -23,7 +23,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.proxy.eventmodel.EntityFinder;
 import org.neo4j.proxy.eventmodel.parameter.Parameter;
 
-public class TransactionParameterType extends BaseParameterType {
+public class TransactionParameterType extends ParameterType {
 
     public TransactionParameterType() {
         super(Transaction.class, String.class);
